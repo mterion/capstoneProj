@@ -21,13 +21,20 @@ cat(green("Running: 'inspectCorpus.R'\n"))
         
         cat(green("Tokenization of the whole corpus will start\n"))
         
-        # Tokenization + remove punctuation
-        toksCAll <- tokens(cAll, remove_punct = TRUE)
-        
-        # Check
+        # # Tokenization + remove punctuation
+        # toksCAll <- tokens(cAll, remove_punct = TRUE)
+        # 
+        # # Save
+        # saveRDS(toksCAll, "./data/processedData/toksCAll.RDS")
+        # toksCAll <- readRDS("./data/processedData/toksCAll.RDS")
+        # 
+        # # Check
                 #head(toksCAll)
 
         cat(green("Tokenization done and punctuation removed\n"))
+        
+        cat(green("Tokens: 'toksCAll' saved and read from RDS\n"))
+        toksCAll <- readRDS("./data/processedData/toksCAll.RDS")
 
 
         
