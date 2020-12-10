@@ -1,8 +1,5 @@
-cAll <- readRDS("./data/processedData/cAll.RDS")
-
-
 # Tokenization
-        cat(green("Running: 'corpusModification.r'\n"))
+        cat(green("Running: 'dataTokens.r'\n"))
         cat(green("Tokenization of the whole corpus will start\n"))
         
         # Tokenization + remove punctuation
@@ -14,10 +11,11 @@ cAll <- readRDS("./data/processedData/cAll.RDS")
         cat(green("Tokenization done and punctuation removed\n"))
         
 # Remove stop words
-        toksCAll1 <- tokens_remove(toksCAll, pattern = stopwords("en"), padding = TRUE)
+        toksCAll <- tokens_remove(toksCAll, pattern = stopwords("en"), padding = TRUE)
                 # padding = TRUE means that the lenght of doc will not be changed
-        # Show
-        head(toksCAll1)       # Position indices kept, bec word replaced with ""
+        
+                # check
+                # head(toksCAll)       # Position indices kept, bec word replaced with ""
                 
 # Remove dirty words
 
@@ -25,6 +23,8 @@ cAll <- readRDS("./data/processedData/cAll.RDS")
                         # "./data/rawData/dirtyWord.txt")
                 
         badWords <- read.table("./data/rawData/dirtyWord.txt", sep = "\n", quote = "", header = F, colClasses = "character", encoding="UTF-8")
-        toksCAll2 <- tokens_remove(toksCAll1, pattern = badWords$V1, valuetype = "fixed", padding=TRUE ) # fixed for exact matching
-        head(toksCAll2)
+        toksCAll <- tokens_remove(toksCAll, pattern = badWords$V1, valuetype = "fixed", padding=TRUE ) # fixed for exact matching
+        rm(badWords)
+        
+
         

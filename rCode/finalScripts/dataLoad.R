@@ -45,6 +45,7 @@ cat(green("Data summary starting\n"))
         cat(green("Data loaded\n"))
         
 # Nr of lines
+        cat(green("Data summary calculations and plots\n"))
         blogsLinesNr <- length(blogsLines)
         newsLinesNr <- length(newsLines)
         twitterLinesNr <- length(twitterLines)
@@ -100,7 +101,7 @@ cat(green("Data summary starting\n"))
                          facet_wrap(~type) +
                         theme(plot.margin=unit(c(0.5,0,0.5,0),"cm")) +
                          theme(legend.position = "none")
-                histWordCount
+                print(histWordCount)
                 
                 # Violin plot
                 violinWordCount <- ggplot(data=wordNrDf, aes(x = type, y = nr)) +
@@ -118,12 +119,17 @@ cat(green("Data summary starting\n"))
                   ) +
                   theme(plot.title = element_text(hjust = 0.5, size = 15)) +
                   theme(legend.title = element_text(face = "bold"))
-                violinWordCount
+                print(violinWordCount)
       
-# Sum
+# Word Sum
         blogsWordSum <- sum(blogsWordNr)
         newsWordSum <- sum(newsWordNr)
         twitterWordSum <- sum(twitterWordNr)
+        
+# Word max
+        blogsWordMax <- max(blogsWordNr)
+        newsWordMax <- max(newsWordNr)
+        twitterWordMax <- max(twitterWordNr)
         
 # Mean
         blogsWordMean <- mean(blogsWordNr)
@@ -141,19 +147,21 @@ cat(green("Data summary starting\n"))
           c(blogsLinesNr, newsLinesNr, twitterLinesNr ), 
           c(blogsCharMax, newsCharMax, twitterCharMax), 
           c(blogsWordSum, newsWordSum, twitterWordSum),
+          c(blogsWordMax, newsWordMax, twitterWordMax),
           c(blogsWordMean, newsWordMean, twitterWordMean),
           c(blogsWordMedian, newsWordMedian, twitterWordMedian)
         )
         
         rownames(fileSummary) <- c("Blogs", "News", "Twitts")
-        colnames(fileSummary) <- c("TxtSize(MB)", "LinesNr", "Maxchar", "WordSum", "WordMean", "WordMedian")
+        colnames(fileSummary) <- c("TxtSize(MB)", "LinesNr", "Maxchar", "WordSum", "WordMax", "WordMean", "WordMedian")
 
         cat(green("Raw data summary:\n"))
         print(fileSummary)
         rm(blogsCharMax, blogsCharNr, blogsLinesNr, blogsTxtSize, blogsWordMean, blogsWordMedian,
            blogsWordNr, blogsWordSum, connect, newsCharNr, newsLinesNr, newsTxtSize, newsWordMean, newsWordMedian, 
            newsWordNr, newsWordSum, twitterCharMax, twitterCharNr, twitterLinesNr, twitterTxtSize, 
-           twitterWordMean, twitterWordMedian, twitterWordNr, twitterWordSum, newsCharMax)
+           twitterWordMean, twitterWordMedian, twitterWordNr, twitterWordSum, newsCharMax,
+           blogsWordMax, newsWordMax, twitterWordMax, histWordCount, violinWordCount, wordNrDf)
 
         #Quiz:       
         # Question 4: In the en_US twitter data set,Divide the number of lines where the word "love" (all lowercase) occurs by the number of lines the word "hate" (all lowercase) occurs, about what do you get?
@@ -168,11 +176,7 @@ cat(green("Data summary starting\n"))
                 
                 # length(grep("A computer once beat me at chess, but it was no match for me at kickboxing", twitterLines))
 
-# Plots of distribution:
-        
-        
-                        
-                
+
 #=======================
 # DataFrame creation
 #=======================
