@@ -23,7 +23,7 @@ rm(list = ls())
 # Load data and corpus creation
         source("./rCode/finalScripts/dataLoad.R")
         # saveRDS(cAll, "./data/processedData/cAll.RDS")
-        cAll <- readRDS("./data/processedData/cAll.RDS")
+        # cAll <- readRDS("./data/processedData/cAll.RDS")
         
 
 

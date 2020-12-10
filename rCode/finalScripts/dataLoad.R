@@ -65,7 +65,62 @@ cat(green("Data summary starting\n"))
         newsWordNr <- stri_count_words(newsLines)
         twitterWordNr <- stri_count_words(twitterLines)
         
-        # Sum
+        # Plot
+                #Make df
+                blogsWordNrDf <- data.frame(blogsWordNr) %>%
+                              rename(nr = blogsWordNr) %>%
+                              mutate(type = "Blogs")
+                newsWordNrDf <- data.frame(newsWordNr) %>%
+                              rename(nr = newsWordNr) %>%
+                              mutate(type = "News")
+                twitterWordNrDf <- data.frame(twitterWordNr) %>%
+                              rename(nr = twitterWordNr) %>%
+                              mutate(type = "Tweets")
+                head(blogsWordNrDf); head(newsWordNrDf); head(twitterWordNrDf)
+                
+                # Merge 3 df into 1 df with cols: nr and type
+                wordNrDf <- rbind(blogsWordNrDf, newsWordNrDf, twitterWordNrDf) %>%
+                  mutate(type = as.factor(type))
+                
+                rm(blogsWordNrDf, newsWordNrDf, twitterWordNrDf)
+                        #table(wordNrDf$type)
+                
+                # Facets histogram plot
+                histWordCount <- ggplot(data=wordNrDf, aes(x = nr, fill = type)) +
+                          scale_fill_manual(values=c("steelblue", "salmon", "seagreen")) +
+                          geom_histogram(
+                            breaks= seq(0, 180, by=1)) +
+                          labs(
+                            title = "Word Count Distribution",
+                            x = "Number of words"
+                            ) +
+                          scale_y_continuous(name = "Frequency", labels = scales::comma) +
+                          theme(plot.title = element_text(hjust = 0.5, size = 15)) +
+                                theme(legend.title = element_text(face = "bold")) +
+                         facet_wrap(~type) +
+                        theme(plot.margin=unit(c(0.5,0,0.5,0),"cm")) +
+                         theme(legend.position = "none")
+                histWordCount
+                
+                # Violin plot
+                violinWordCount <- ggplot(data=wordNrDf, aes(x = type, y = nr)) +
+                  geom_violin(
+                    aes(fill = type)
+                    ) +
+                  scale_fill_manual(values=c("steelblue", "salmon", "seagreen")) +
+                  coord_cartesian(ylim = c(0,150)) + #coor_cart is a simple zoom, it won't chang the data setting limits on a scale as well, so it won't change the mean/median stat
+                  geom_boxplot(width=0.1) +
+                  labs(
+                    fill = "Type",
+                    title = "Distributions with medians and quartiles",
+                    x = "",
+                    y = "Frequency"
+                  ) +
+                  theme(plot.title = element_text(hjust = 0.5, size = 15)) +
+                  theme(legend.title = element_text(face = "bold"))
+                violinWordCount
+      
+# Sum
         blogsWordSum <- sum(blogsWordNr)
         newsWordSum <- sum(newsWordNr)
         twitterWordSum <- sum(twitterWordNr)
@@ -100,6 +155,24 @@ cat(green("Data summary starting\n"))
            newsWordNr, newsWordSum, twitterCharMax, twitterCharNr, twitterLinesNr, twitterTxtSize, 
            twitterWordMean, twitterWordMedian, twitterWordNr, twitterWordSum, newsCharMax)
 
+        #Quiz:       
+        # Question 4: In the en_US twitter data set,Divide the number of lines where the word "love" (all lowercase) occurs by the number of lines the word "hate" (all lowercase) occurs, about what do you get?
+                
+                # sum(as.numeric(grep("love", twitterLines)))/sum(as.numeric(grep("hate", twitterLines)))
+        
+        # Q5: The one tweet in the en_US twitter data set that matches the word “biostats” says what?
+        
+                # grep("biostats", twitterLines, value = TRUE)
+        
+        # Q6: Question 6: How many tweets have the exact characters "A computer once beat me at chess, but it was no match for me at kickboxing". (I.e. the line matches those characters exactly.)
+                
+                # length(grep("A computer once beat me at chess, but it was no match for me at kickboxing", twitterLines))
+
+# Plots of distribution:
+        
+        
+                        
+                
 #=======================
 # DataFrame creation
 #=======================
@@ -202,12 +275,7 @@ cat(green("Individual corpuses merged into one large corpus 'cAll'\n"))
       
 
         
-                
         
-# Questions
-        # 1. 200 MB
-        # 2. Over 2 mio
-        # Over 40 thousand
    
         
 

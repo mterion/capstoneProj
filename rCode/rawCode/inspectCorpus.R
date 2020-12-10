@@ -11,10 +11,12 @@ cat(green("Running: 'inspectCorpus.R'\n"))
 # Inspect var
         print(table(cAll$type))
                 
-# Subset corpus based on doc level var
-        # ndoc(cAll)
+# Subset corpus based on doc level var type
+        ndoc(cAll)
         # 
+        # cBlogs <- corpus_subset(cAll, type %in% "blogs")
         # cNews <- corpus_subset(cAll, type %in% "news")
+        # cTwitts <- corpus_subset(cAll, type %in% "twitts")
         # ndoc(cNews)
         # 
 # Tokenization
@@ -32,9 +34,11 @@ cat(green("Running: 'inspectCorpus.R'\n"))
                 #head(toksCAll)
 
         cat(green("Tokenization done and punctuation removed\n"))
+        cat(green("Tokens: 'toksCAll' read from saved RDS\n"))
         
-        cat(green("Tokens: 'toksCAll' saved and read from RDS\n"))
+        # Load RDS tokens
         toksCAll <- readRDS("./data/processedData/toksCAll.RDS")
+        head(docvars(toksCAll))
 
 
         
@@ -43,12 +47,12 @@ cat(green("Running: 'inspectCorpus.R'\n"))
                 # toksNoStop1 <- tokens_select(toksCAll, pattern = stopwords("en"), selection = "remove")
         
                 # Is the same as (but keep the position indices)
-                toksCAll1 <- tokens_remove(toksCAll, pattern = stopwords("en"), padding = TRUE)
+                toksCAll <- tokens_remove(toksCAll, pattern = stopwords("en"), padding = TRUE)
                         # padding = TRUE means that the lenght of doc will not be changed
                 # Show
-                head(toksNoStop1)       # Position index not kept
-                head(toksNoStop2)       # Position indices kept, bec word replaced with ""
-                tail(toksNoStop)        # ... the last
+                # head(toksNoStop1)       # Position index not kept
+                # head(toksNoStop2)       # Position indices kept, bec word replaced with ""
+                # tail(toksNoStop)        # ... the last
                 
                         # print()       # Careful, could print the whole!
                 
@@ -59,56 +63,46 @@ cat(green("Running: 'inspectCorpus.R'\n"))
                 
                 badWords <- read.table("./data/rawData/dirtyWord.txt", sep = "\n", quote = "", header = F, colClasses = "character", encoding="UTF-8")
                 
+                cat(green("Stop words and dirty words removed\n"))
                 
-        
-        # Keep only certain word
-        toksWordSel <- tokens_select(toksCAll, pattern = c("worker"), padding = TRUE)
+        # Lowercase tokens
+                toksCAll <- tokens_tolower(toksCAll)
+                cat(green("Tokens converted to lower case\n"))
+
+# Quiz:       
+        # Divide the number of lines where the word "love" (all lowercase) occurs by the number of lines the word "hate" (all lowercase) occurs, about what do you get?
+        # Keyword search:
+                kwLove <- kwic(toksCAll, pattern = "love")
+                kwHate <- kwic(toksCAll, pattern = "hate")
                 
-                # Show (but this keep the whole set of doc, even if empty!)
-                        #head(toksWordSel)
-        
-        # To analyze worlds around keyword
-        toksWindSel <- tokens_select(toksCAll, pattern = "worker", padding = TRUE, window = 5)
+                table(kwLove$pattern)
+                table(kwHate$pattern)
                 
-                # Show
-                head(toksWindSel)
-        
-        # Regular expression:
-                # Can be used: see ?pattern
-                # See regularExpression Cheatsheet
+                linesNrLove <- length(kwLove$docname)
+                linesNrHate <- length(kwHate$docname)
+                linesNrLove / linesNrHate
+                # Problem with this approach is that it takes all instances of the word
+                        # Then the doc is cited twice if twice the word in the document
+                        # Also need to focus just on the subset twitter
+                        # This kind of processing is easier to do from r at the begining with readLines (see dataLoad file)
                 
+                kwLove <- kwic(toksCAll, pattern = "love" & cAll$type %in% "blogs")
+                kwHate <- kwic(toksCAll, pattern = "hate")
                 
-# Keyword in context
-        # Single kw
-                # can also use * for ex: "viol*" 
-        kwViolence <- kwic(toksCAll, pattern = "violence")
-        
-        # Visualization: the best is to clik on it in the data environment to be displayed in the viewer
-        head(kwViolence)
-        
-        # Multiple kw
-        kmViolWorker <- kwic(toksCAll, pattern= c("violence", "worker"))
-                # But it seems that it makes OR and not AND bec it adds up both
-        
-        # Window -> nr of word betw keywords
-        kmViolWorkWind <- kwic(toksCAll, pattern= c("violence", "worker"), window = 2)
-                # Does not seem to work always the same result
-        
-        # Phrase
-        kmPhrase <- kwic(toksCAll, pattern= phrase("Laudan Taiby"))
-        
-        # With a dictionary
-        download.file('https://raw.githubusercontent.com/quanteda/tutorials.quanteda.io/master/content/dictionary/newsmap.yml', './data/rawData/newsmap.yml')
-        
-        dict_newsmap <- dictionary(file = "./data/rawData/newsmap.yml")
-        
-        kmAfrica <- kwic(toksCAll, dict_newsmap["AFRICA"])
-        head(kmAfrica)
-        
-# Look up dictionary
-        toksAllCountry <- tokens_lookup(toksCAll, dictionary = dict_newsmap, levels = 3)
-        head(toksAllCountry)
-        dfm(toksAllCountry)
+                linesNrLoveUnique <-length(unique(kwLove$docname))
+                linesNrHateUnique <- length(unique(kwHate$docname))
+                linesNrLoveUnique / linesNrHateUnique
+                
+                cAll$type %in% "blogs"
+                
+
+                
+                kwLoveRegEx <- kwic(toksCAll, phrase("love"), valuetype = "regex")
+                kwHateRegEx <- kwic(toksCAll, phrase("hate"), valuetype = "regex")
+                kwHateRegEx$keyword
+                
+
+                
 
        
                 
