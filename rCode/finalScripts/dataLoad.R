@@ -86,7 +86,7 @@ cat(green("Data summary starting\n"))
                 rm(blogsWordNrDf, newsWordNrDf, twitterWordNrDf)
                         #table(wordNrDf$type)
                 
-                # Facets histogram plot
+        # Facets histogram plot
                 histWordCount <- ggplot(data=wordNrDf, aes(x = nr, fill = type)) +
                           scale_fill_manual(values=c("steelblue", "salmon", "seagreen")) +
                           geom_histogram(
@@ -95,18 +95,21 @@ cat(green("Data summary starting\n"))
                             title = "Word Count Distribution",
                             x = "Number of words"
                             ) +
-                          scale_y_continuous(name = "Frequency", labels = scales::comma) +
+                          scale_y_continuous(name = "Frequency", labels = scales::number) +
                           theme(plot.title = element_text(hjust = 0.5, size = 15)) +
                                 theme(legend.title = element_text(face = "bold")) +
                          facet_wrap(~type) +
                         theme(plot.margin=unit(c(0.5,0,0.5,0),"cm")) +
                          theme(legend.position = "none")
+                #print(histWordCount)
+                histWordCount <- ggplotly(histWordCount)
                 print(histWordCount)
-                
-                # Violin plot
+                saveRDS(histWordCount, "./figures/finalFigures/histWordCount.RDS")
+             
+        # Violin plot
                 violinWordCount <- ggplot(data=wordNrDf, aes(x = type, y = nr)) +
                   geom_violin(
-                    aes(fill = type)
+                    aes(fill = type), alpha = 0.9
                     ) +
                   scale_fill_manual(values=c("steelblue", "salmon", "seagreen")) +
                   coord_cartesian(ylim = c(0,150)) + #coor_cart is a simple zoom, it won't chang the data setting limits on a scale as well, so it won't change the mean/median stat
@@ -118,9 +121,12 @@ cat(green("Data summary starting\n"))
                     y = "Frequency"
                   ) +
                   theme(plot.title = element_text(hjust = 0.5, size = 15)) +
-                  theme(legend.title = element_text(face = "bold"))
+                  theme(legend.position = "none")
+                #print(violinWordCount)
+                violinWordCount <- ggplotly(violinWordCount)
                 print(violinWordCount)
-      
+                saveRDS(violinWordCount, "./figures/finalFigures/violinWordCount.RDS")
+              
 # Word Sum
         blogsWordSum <- sum(blogsWordNr)
         newsWordSum <- sum(newsWordNr)
@@ -157,6 +163,9 @@ cat(green("Data summary starting\n"))
 
         cat(green("Raw data summary:\n"))
         print(fileSummary)
+        saveRDS(fileSummary, "./figures/finalFigures/fileSummary.RDS")
+        
+        
         rm(blogsCharMax, blogsCharNr, blogsLinesNr, blogsTxtSize, blogsWordMean, blogsWordMedian,
            blogsWordNr, blogsWordSum, connect, newsCharNr, newsLinesNr, newsTxtSize, newsWordMean, newsWordMedian, 
            newsWordNr, newsWordSum, twitterCharMax, twitterCharNr, twitterLinesNr, twitterTxtSize, 

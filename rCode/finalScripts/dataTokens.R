@@ -26,5 +26,14 @@
         toksCAll <- tokens_remove(toksCAll, pattern = badWords$V1, valuetype = "fixed", padding=TRUE ) # fixed for exact matching
         rm(badWords)
         
+# Remove unsignificant words
+        unsigWords <- c(
+                "rt" # people type "RT" at the beginning of a Tweet to indicate that they are re-posting someone else's content.
+        )
+        unsigWordsDf <- data.frame(unsigWords, stringsAsFactors = F) %>%
+                rename(word = unsigWords)
+        
+        toksCAll <- tokens_remove(toksCAll, pattern = unsigWordsDf$word, valuetype = "fixed", padding=TRUE ) # fixed for exact matching
+        rm(unsigWords, unsigWordsDf)
 
         

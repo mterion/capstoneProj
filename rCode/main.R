@@ -13,6 +13,7 @@ rm(list = ls())
         library(crayon) # for cat colors green
         library(newsmap) # for geographical dict
         library(ggplot2)
+        library(plotly)
 
 #=======================
 # Corpus Creation
