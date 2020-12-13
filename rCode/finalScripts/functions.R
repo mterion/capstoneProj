@@ -35,11 +35,11 @@
         nGramPlotFun <- function(nGram, titleNGramPannelPlot, marginPannelPlot){
                 # marginPannelPlot enable to have enough space if the nr of words are increased on the graph
                 # tokens created on the base of the nGram entered
-                cat(green("Start of the tokenization for the n-grams value chosen\n"))
+                cat(green("Plot n-grams -> Tokenization for the n-grams value: ", nGram,"\n"))
                 toksNGramXAll <- tokens_ngrams(toksCAll, nGram)
                         # head(toksNGramXAll)
                 # dfm creation
-                cat(green("Creation of document-feature matrix\n"))
+                cat(green("           Creation of document-feature matrix\n"))
                 dfmToksNGramXAll <- dfm(toksNGramXAll, remove="")
                         # head(dfmToksNGramXAll)
                 
@@ -55,7 +55,7 @@
                                 # head(dfmToksNGramXBlogs); head(dfmToksNGramXNews); head(dfmToksNGramXTwitts)
                         
                 # Top Features
-                cat(green("Identification of 15 top features\n"))
+                cat(green("           Identification of 15 top features\n"))
                 topFeatAll <- topfeatures(dfmToksNGramXAll, 15)
                 topFeatBlogs <- topfeatures(dfmToksNGramXBlogs, 15)
                 topFeatNews <- topfeatures(dfmToksNGramXNews, 15)
@@ -97,4 +97,51 @@
                 
                 # Garbage collection cleaned to free up RAM
                 gc()
+        }
+        
+# Ngram individual tables
+# dfmToksName <- dfmToksNGramXAll
+# typeDoc <- "Integrated Dataset, "
+# colorHeader <- "rgb(118,238,0)"
+# colorFirstCol <-  "lightgreen"
+        
+
+        
+        nGramIndivTableFun <- function(dfmToksName, typeDoc, colorHeader){
+                                cat(green("Creation of individual n-grams table\n"))
+                
+                                colSumToks <- colSums(dfmToksName)
+                                featNamesToks <- names(colSumToks)
+                                
+                                tableFeatFreq <- data.frame(featNamesToks, colSumToks) %>%
+                                                arrange(desc(colSumToks)) %>% 
+                                                rename(count = colSumToks) %>%
+                                                rename(ngrams = featNamesToks) %>%
+                                                mutate(proportion = round((count / sum(count) * 100), digits = 4)) %>%
+                                                filter(row_number() < maxTableRows)
+                                        
+                                        row.names(tableFeatFreq) <- 1: nrow(tableFeatFreq)
+                                        
+                                fig <- plot_ly(
+                                  type = 'table',
+                                  columnorder = c(1,2,3,4),
+                                  columnwidth = c(80,400, 80, 80),
+                                  header = list(
+                                    values = c("Rank", paste(typeDoc, "n-grams:", nGram), "Count", "Proportion"),
+                                  align = c('center', rep('center', ncol(tableFeatFreq))),
+                                  line = list(width = 1, color = 'black'),
+                                  fill = list(color = colorHeader),
+                                  font = list(family = "Arial", size = 14, color = "white")
+                                  ),
+                                  cells = list(
+                                    values = rbind(
+                                      rownames(tableFeatFreq), 
+                                      t(as.matrix(unname(tableFeatFreq)))
+                                    ),
+                                    align = c('center', rep('center', ncol(tableFeatFreq))),
+                                    line = list(color = "black", width = 1),
+                                    fill = list(color = c("rgb(229,229,229)", "rgb(250,250,250)")),
+                                    font = list(family = "Arial", size = 12, color = c("black"))
+                                  ))
+                                return(fig)
         }

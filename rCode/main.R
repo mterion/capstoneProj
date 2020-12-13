@@ -35,14 +35,14 @@
         
         # Save / read
         saveRDS(cAll, "./data/processedData/cAll.RDS")
-        #cAll <- readRDS("./data/processedData/cAll.RDS")
+        cAll <- readRDS("./data/processedData/cAll.RDS")
 
 # Tokenization
         source("./rCode/finalScripts/dataTokens.R")
 
         # Save / read
         saveRDS(toksCAll, "./data/processedData/toksCAll.RDS")
-        #toksCAll <- readRDS("./data/processedData/toksCAll.RDS")
+        toksCAll <- readRDS("./data/processedData/toksCAll.RDS")
 
 # NGrams operations
         source("./rCode/finalScripts/dataNGram.R")

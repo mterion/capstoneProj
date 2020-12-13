@@ -1,56 +1,79 @@
+nGramTableFun <- function(nGram, maxTableRows = 50000){
+               cat(green("Table n-grams -> Tokenization for the n-grams value: ", nGram,"\n"))
 
-
-
-# Document-feature matrix
-        cat(green("Running: 'dataDFM.r'\n"))
-        cat(green("Document-feature matrix creation\n"))
-        
-# Create DFM
-        # All
-        dfmAll <- dfm(toksCAll, remove="") # need to remove blank strings, because I kept padding true before to keep the order of words
-        
-        # Blogs
-        dfmBlogs <- dfm_subset(dfmAll, type == "blogs")
-
-        # News
-        dfmNews <- dfm_subset(dfmAll, type == "news")
-
-        # Twitts
-        dfmTwitts <- dfm_subset(dfmAll, type =="twitts")
-        
-                # Checks
-                # head(dfmAll); head(dfmBlogs); head(dfmNews); head(dfmTwitts)
-        
-# Inspect dfm
-        # nr docs
-        nrDocAll <- ndoc(dfmAll)
-        nrDocBlogs <- ndoc(dfmBlogs)
-        nrDocNews <- ndoc(dfmNews)
-        nrDocTwitts <- ndoc(dfmTwitts)
-        
-                # Checks
-                # nrDocAll; nrDocBlogs; nrDocNews; nrDocTwitts
-        
-# Features
-        # Number features        
-        nrFeatAll <- nfeat(dfmAll)
-        nrFeatBlogs <- nfeat(dfmBlogs)
-        nrFeatNews <- nfeat(dfmNews)
-        nrFeatTwitts <- nfeat(dfmTwitts)
+                # Global vars
                 
-                # Checks
-                # nrFeatAll; nrFeatBlogs; nrFeatNews; nrFeatTwitts
-                # All equal to the same nr of features, bec are simply the cols of the dfm
+                nGram <<- nGram # makes it a global var so that my 2nd fun will find its value
+                maxTableRows <<- maxTableRows
                 
-# Top Features
-        topFeatAll <- topfeatures(dfmAll, 15)
-        topFeatBlogs <- topfeatures(dfmBlogs, 15)
-        topFeatNews <- topfeatures(dfmNews, 15)
-        topFeatTwitts <- topfeatures(dfmTwitts, 15)
+                # tokens created on the base of the nGram entered
+                toksNGramXAll <- tokens_ngrams(toksCAll, nGram)
+                        # head(toksNGramXAll)
+                # dfm creation
+                cat(green("Creation of document-feature matrix\n"))
+                dfmToksNGramXAll <- dfm(toksNGramXAll, remove="")
+                        # head(dfmToksNGramXAll)
+                
+                # Dfm subset for 3 types
+                        # Blogs
+                        dfmToksNGramXBlogs <- dfm_subset(dfmToksNGramXAll, type == "blogs")
+                
+                        # News
+                        dfmToksNGramXNews <- dfm_subset(dfmToksNGramXAll, type == "news")
+                
+                        # Twitts
+                        dfmToksNGramXTwitts <- dfm_subset(dfmToksNGramXAll, type =="twitts")
+                                # head(dfmToksNGramXBlogs); head(dfmToksNGramXNews); head(dfmToksNGramXTwitts)
+                
+        # Plotly tables
+                # All
+                cat(green("Creation of n-grams table: All\n"))
+                rgbChartreuse2 <- "rgb(118,238,0)"
+                nGramTableAll <- nGramIndivTableFun(dfmToksNGramXAll, typeDoc = "Integrated Dataset, ", colorHeader = rgbChartreuse2)
+                print(nGramTableAll)
+                saveRDS(nGramTableAll, "./figures/finalFigures/nGramTableAll.RDS")
+                
+                # Blogs
+                cat(green("Creation of n-grams table: Blogs\n"))
+                rgbSteelblue <- "rgb(70,130,180)"
+                nGramTableBlogs <- nGramIndivTableFun(dfmToksNGramXAll, typeDoc = "Blogs, ", colorHeader = rgbSteelblue)
+                print(nGramTableBlogs)
+                saveRDS(nGramTableBlogs, "./figures/finalFigures/nGramTableBlogs.RDS")
+
+                # News
+                cat(green("Creation of n-grams table: News\n"))
+                rgbSalmon <- "rgb(250,128,114)"
+                nGramTableNews <- nGramIndivTableFun(dfmToksNGramXAll, typeDoc = "News, ", colorHeader = rgbSalmon)
+                print(nGramTableNews)
+                saveRDS(nGramTableNews, "./figures/finalFigures/nGramTableNews.RDS")
+
+                # Twitts
+                cat(green("Creation of n-grams table: Twitts\n"))
+                rgbSeagreen <- "rgb(46,139,87)"
+                nGramTableTwitts <- nGramIndivTableFun(dfmToksNGramXAll, typeDoc = "Twitts, ",colorHeader = rgbSeagreen)
+                print(nGramTableTwitts)
+                saveRDS(nGramTableTwitts, "./figures/finalFigures/nGramTableTwitts.RDS")
+
+                rm(nGram)# remove global var
+                gc() # garbage collection
+                
+}
         
-# Coumns sum
-        head(colSums(dfmAll), 10)
-        head(colSums(dfmNews), 10)
-        
-        # simply need to assign this to a vector, sort the order and extract the 50% of this vector
-        # I stoped there, need to construct now a Feature co-occurence matrix
+
+
+nGramTableFun(nGram = 1)
+
+nGramTableAll <- readRDS("./figures/finalFigures/nGramTableAll.RDS")
+nGramTableBlogs <- readRDS("./figures/finalFigures/nGramTableBlogs.RDS")
+nGramTableNews <- readRDS("./figures/finalFigures/nGramTableNews.RDS")
+nGramTableTwitts <- readRDS("./figures/finalFigures/nGramTableTwitts.RDS")
+
+print(nGramTableAll)
+print(nGramTableBlogs)
+print(nGramTableNews)
+print(nGramTableTwitts)
+
+
+               
+                     
+
