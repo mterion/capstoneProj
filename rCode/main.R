@@ -48,8 +48,10 @@
         source("./rCode/finalScripts/dataNGram.R")
 
 # Document-feature matrix and feature co-occurence matrix
-        source("./rCode/rawCode/dfm_fcm.R")
+        #source("./rCode/rawCode/dfm_fcm.R")
 
+        
+        
 # End spacy session        
         spacy_finalize()
         

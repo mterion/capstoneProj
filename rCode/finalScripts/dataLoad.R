@@ -49,6 +49,8 @@ cat(green("Data summary starting\n"))
         blogsLinesNr <- length(blogsLines)
         newsLinesNr <- length(newsLines)
         twitterLinesNr <- length(twitterLines)
+        nrOfLinesTotal <-  blogsLinesNr + newsLinesNr + twitterLinesNr
+        nrOfLinesTotal
         
 # Length of the longest lines
         # Create another vect with nr char in vector
@@ -156,15 +158,16 @@ cat(green("Data summary starting\n"))
           c(blogsWordMax, newsWordMax, twitterWordMax),
           c(blogsWordMean, newsWordMean, twitterWordMean),
           c(blogsWordMedian, newsWordMedian, twitterWordMedian)
-        )
+        ) 
         
         rownames(fileSummary) <- c("Blogs", "News", "Twitts")
-        colnames(fileSummary) <- c("TxtSize(MB)", "LinesNr", "Maxchar", "WordSum", "WordMax", "WordMean", "WordMedian")
+        colnames(fileSummary) <- c("TxtSizeMB", "LinesNr", "Maxchar", "WordSum", "WordMax", "WordMean", "WordMedian")
 
+        fileSummary <- fileSummary %>%
+          mutate(TxtSizeMB = round(TxtSizeMB, 0)) %>%
+          mutate(WordMean = round(WordMean, 1))
         cat(green("Raw data summary:\n"))
-        print(fileSummary)
-        saveRDS(fileSummary, "./figures/finalFigures/fileSummary.RDS")
-        
+
         
         rm(blogsCharMax, blogsCharNr, blogsLinesNr, blogsTxtSize, blogsWordMean, blogsWordMedian,
            blogsWordNr, blogsWordSum, connect, newsCharNr, newsLinesNr, newsTxtSize, newsWordMean, newsWordMedian, 
@@ -172,6 +175,34 @@ cat(green("Data summary starting\n"))
            twitterWordMean, twitterWordMedian, twitterWordNr, twitterWordSum, newsCharMax,
            blogsWordMax, newsWordMax, twitterWordMax, histWordCount, violinWordCount, wordNrDf)
 
+# Plotly table
+         rgbChartreuse2 <- "rgb(118,238,0)"
+         colorHeader <- rgbChartreuse2
+        
+        fileSummaryTable <- plot_ly(
+              type = 'table',
+              columnwidth = c(50,50,50,50,50,50,50),
+              columnorder = c(1,2,3,4,5,6,7),
+              header = list(
+                values = c("Text Size (MB)","Number of Documents", "Total Number of Words", "Maximum Characters per Line",  "Maximum Words per Line", "Mean of Words per Line", "Median of Words per Line"),
+                align = c("center", "center", "center", "center", "center", "center", "center"),
+                line = list(width = 1, color = 'black'),
+                fill = list(color = c("grey", "grey")),
+                font = list(family = "Arial", size = 14, color = "white")
+              ),
+              cells = list(
+                values = rbind(fileSummary$TxtSizeMB, fileSummary$LinesNr, fileSummary$WordSum, fileSummary$Maxchar,  fileSummary$WordMax, fileSummary$WordMean, fileSummary$WordMedian),
+                align = c("center", "center", "center", "center", "center", "center", "center"),
+                line = list(color = "black", width = 1),
+                font = list(family = "Arial", size = 12, color = c("black"))
+              ))
+            
+            
+        print(fileSummaryTable)
+        saveRDS(fileSummaryTable, "./figures/finalFigures/fileSummaryTable.RDS")
+        rm(fileSummary, fileSummaryTable, colorHeader, rgbChartreuse2)
+        
+        
         #Quiz:       
         # Question 4: In the en_US twitter data set,Divide the number of lines where the word "love" (all lowercase) occurs by the number of lines the word "hate" (all lowercase) occurs, about what do you get?
                 
@@ -209,10 +240,15 @@ cat(green("Data summary starting\n"))
 # Clean data
 #=======================
 
+  # Character removal
+        indivCharRemovalRegEx <- "[>|<|=|~|#|/|([0-9]+-[0-9]+)]" # clean characters and not word. Words, punct, emojis are done later at the level of tokenization
+
+# Df
         blogsDf <- blogsDf %>% 
                 rename(text = as.character.blogsLines.) %>%
                 mutate(text = as.character(text)) %>%
                 mutate(text = stri_replace_all_regex(text, '\"', '')) %>% # use stringi because much faster than gsub   
+                mutate(text = stri_replace_all_regex(text, indivCharRemovalRegEx , "")) %>% 
                 mutate(doc_id = "enBlogs") %>%
                 mutate(type = "blogs")
         
@@ -220,6 +256,7 @@ cat(green("Data summary starting\n"))
                 rename(text = as.character.newsLines.) %>%
                 mutate(text = as.character(text)) %>%         
                 mutate(text = stri_replace_all_regex(text, '\"', '')) %>%
+                mutate(text = stri_replace_all_regex(text, indivCharRemovalRegEx , "")) %>% 
                 mutate(doc_id = "enUSNews") %>%
                 mutate(type = "news")
         
@@ -227,6 +264,7 @@ cat(green("Data summary starting\n"))
                 rename(text = as.character.twitterLines.) %>%
                 mutate(text = as.character(text)) %>%            
                 mutate(text = stri_replace_all_regex(text, '\"', '')) %>%
+                mutate(text = stri_replace_all_regex(text, indivCharRemovalRegEx , "")) %>% 
                 mutate(doc_id = "enTwitts") %>%
                 mutate(type = "twitts")
         

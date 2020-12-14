@@ -100,15 +100,8 @@
         }
         
 # Ngram individual tables
-# dfmToksName <- dfmToksNGramXAll
-# typeDoc <- "Integrated Dataset, "
-# colorHeader <- "rgb(118,238,0)"
-# colorFirstCol <-  "lightgreen"
-        
-
-        
         nGramIndivTableFun <- function(dfmToksName, typeDoc, colorHeader){
-                                cat(green("Creation of individual n-grams table\n"))
+                                cat(green("          Creation of the individual n-grams table\n"))
                 
                                 colSumToks <- colSums(dfmToksName)
                                 featNamesToks <- names(colSumToks)
@@ -127,7 +120,7 @@
                                   columnorder = c(1,2,3,4),
                                   columnwidth = c(80,400, 80, 80),
                                   header = list(
-                                    values = c("Rank", paste(typeDoc, "n-grams:", nGram), "Count", "Proportion"),
+                                    values = c("Rank", paste0(typeDoc, " : n-grams ", nGram), "Count", "Proportion"),
                                   align = c('center', rep('center', ncol(tableFeatFreq))),
                                   line = list(width = 1, color = 'black'),
                                   fill = list(color = colorHeader),
@@ -145,3 +138,75 @@
                                   ))
                                 return(fig)
         }
+        
+#nGramTables
+        nGramTableFun <- function(nGram, maxTableRows){
+                       cat(green("Table n-grams -> Tokenization for the n-grams value: ", nGram,"\n"))
+        
+                        # Global vars
+                        
+                        nGram <<- nGram # makes it a global var so that my 2nd fun will find its value
+                        maxTableRows <<- maxTableRows
+                        
+                        # tokens created on the base of the nGram entered
+                        toksNGramXAll <- tokens_ngrams(toksCAll, nGram)
+                                # head(toksNGramXAll)
+                        # dfm creation
+                        cat(green("Creation of document-feature matrix\n"))
+                        dfmToksNGramXAll <- dfm(toksNGramXAll, remove="")
+                                # head(dfmToksNGramXAll)
+                        
+                        # Dfm subset for 3 types
+                                # Blogs
+                                dfmToksNGramXBlogs <- dfm_subset(dfmToksNGramXAll, type == "blogs")
+                        
+                                # News
+                                dfmToksNGramXNews <- dfm_subset(dfmToksNGramXAll, type == "news")
+                        
+                                # Twitts
+                                dfmToksNGramXTwitts <- dfm_subset(dfmToksNGramXAll, type =="twitts")
+                                        # head(dfmToksNGramXBlogs); head(dfmToksNGramXNews); head(dfmToksNGramXTwitts)
+                        
+                # Plotly tables
+                        # All
+                        cat(green("     Creation of n-grams table: All\n"))
+                        rgbChartreuse2 <- "rgb(118,238,0)"
+                        nGramTableAll <- nGramIndivTableFun(dfmToksNGramXAll, typeDoc = "Integrated Dataset", colorHeader = rgbChartreuse2)
+                        print(nGramTableAll)
+                        cat(green("     Saving of n-grams table: All\n"))
+                        saveRDS(nGramTableAll, paste0("./figures/finalFigures/nGram_", nGram, "_TableAll.RDS"))
+                        
+                        
+                        # Blogs
+                        cat(green("     Creation of n-grams table: Blogs\n"))
+                        rgbSteelblue <- "rgb(70,130,180)"
+                        nGramTableBlogs <- nGramIndivTableFun(dfmToksNGramXAll, typeDoc = "Blogs", colorHeader = rgbSteelblue)
+                        print(nGramTableBlogs)
+                        cat(green("     Saving of n-grams table: Blogs\n"))
+                        saveRDS(nGramTableBlogs, paste0("./figures/finalFigures/nGram_", nGram, "_TableBlogs.RDS"))
+                        
+                        
+                        # News
+                        cat(green("     Creation of n-grams table: News\n"))
+                        rgbSalmon <- "rgb(250,128,114)"
+                        nGramTableNews <- nGramIndivTableFun(dfmToksNGramXAll, typeDoc = "News", colorHeader = rgbSalmon)
+                        print(nGramTableNews)
+                        cat(green("     Saving of n-grams table: News\n"))
+                        saveRDS(nGramTableNews, paste0("./figures/finalFigures/nGram_", nGram, "_TableNews.RDS"))
+                        
+                        
+                        # Twitts
+                        cat(green("     Creation of n-grams table: Twitts\n"))
+                        rgbSeagreen <- "rgb(46,139,87)"
+                        nGramTableTwitts <- nGramIndivTableFun(dfmToksNGramXAll, typeDoc = "Twitts", colorHeader = rgbSeagreen)
+                        print(nGramTableTwitts)
+                        cat(green("     Saving of n-grams Twitts: All\n"))
+                        saveRDS(nGramTableTwitts, paste0("./figures/finalFigures/nGram_", nGram, "_TableTwitts.RDS"))
+                        
+                        rm(nGram)# remove global var
+                        gc() # garbage collection
+        }
+       
+        
+
+        
