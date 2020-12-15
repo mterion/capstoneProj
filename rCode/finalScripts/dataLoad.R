@@ -94,7 +94,7 @@ cat(green("Data summary starting\n"))
                           geom_histogram(
                             breaks= seq(0, 180, by=1)) +
                           labs(
-                            title = "Word Count Distribution",
+                            title = "Word Count",
                             x = "Number of words"
                             ) +
                           scale_y_continuous(name = "Frequency", labels = scales::number) +
@@ -118,11 +118,11 @@ cat(green("Data summary starting\n"))
                   geom_boxplot(width=0.1) +
                   labs(
                     fill = "Type",
-                    title = "Distributions with medians and quartiles",
+                    # title = "Distributions with medians and quartiles",
                     x = "",
                     y = "Frequency"
                   ) +
-                  theme(plot.title = element_text(hjust = 0.5, size = 15)) +
+                  # theme(plot.title = element_text(hjust = 0.5, size = 15)) +
                   theme(legend.position = "none")
                 #print(violinWordCount)
                 violinWordCount <- ggplotly(violinWordCount)
@@ -151,6 +151,7 @@ cat(green("Data summary starting\n"))
         
 # Summary
         fileSummary <- data.frame(
+          c("Blogs", "News", "Twitts"),
           c(blogsTxtSize, newsTxtSize, twitterTxtSize),
           c(blogsLinesNr, newsLinesNr, twitterLinesNr ), 
           c(blogsCharMax, newsCharMax, twitterCharMax), 
@@ -161,11 +162,12 @@ cat(green("Data summary starting\n"))
         ) 
         
         rownames(fileSummary) <- c("Blogs", "News", "Twitts")
-        colnames(fileSummary) <- c("TxtSizeMB", "LinesNr", "Maxchar", "WordSum", "WordMax", "WordMean", "WordMedian")
+        colnames(fileSummary) <- c("Source", "TxtSizeMB", "LinesNr", "Maxchar", "WordSum", "WordMax", "WordMean", "WordMedian")
 
         fileSummary <- fileSummary %>%
           mutate(TxtSizeMB = round(TxtSizeMB, 0)) %>%
-          mutate(WordMean = round(WordMean, 1))
+          mutate(WordMean = round(WordMean, 1)) %>%
+          mutate(Source = as.character(Source))
         cat(green("Raw data summary:\n"))
 
         
@@ -181,26 +183,28 @@ cat(green("Data summary starting\n"))
         
         fileSummaryTable <- plot_ly(
               type = 'table',
-              columnwidth = c(50,50,50,50,50,50,50),
-              columnorder = c(1,2,3,4,5,6,7),
+              columnwidth = c(50,50,50,50,50,50,50,50),
+              columnorder = c(1,2,3,4,5,6,7,8),
               header = list(
-                values = c("Text Size (MB)","Number of Documents", "Total Number of Words", "Maximum Characters per Line",  "Maximum Words per Line", "Mean of Words per Line", "Median of Words per Line"),
-                align = c("center", "center", "center", "center", "center", "center", "center"),
+                values = c("File Sources", "File Size (MB)","Number of Doc.", "Number of Words", "Max. Characters per Doc.",  "Max. Words per Doc.", "Mean Words per Doc.", "Median Words per Doc."),
+                align = c("center", "center", "center", "center", "center", "center", "center", "center"),
                 line = list(width = 1, color = 'black'),
                 fill = list(color = c("grey", "grey")),
                 font = list(family = "Arial", size = 14, color = "white")
               ),
               cells = list(
-                values = rbind(fileSummary$TxtSizeMB, fileSummary$LinesNr, fileSummary$WordSum, fileSummary$Maxchar,  fileSummary$WordMax, fileSummary$WordMean, fileSummary$WordMedian),
-                align = c("center", "center", "center", "center", "center", "center", "center"),
+                values = rbind(fileSummary$Source, fileSummary$TxtSizeMB, fileSummary$LinesNr, fileSummary$WordSum, fileSummary$Maxchar,  fileSummary$WordMax, fileSummary$WordMean, fileSummary$WordMedian),
+                align = c("center", "center", "center", "center", "center", "center", "center", "center"),
                 line = list(color = "black", width = 1),
                 font = list(family = "Arial", size = 12, color = c("black"))
               ))
             
-            
+        # fileSummaryTable
+        # fig <- fileSummaryTable %>% layout(autosize = T)
+        
         print(fileSummaryTable)
-        saveRDS(fileSummaryTable, "./figures/finalFigures/fileSummaryTable.RDS")
-        rm(fileSummary, fileSummaryTable, colorHeader, rgbChartreuse2)
+        saveRDS(fileSummaryTable, "./figures/finalFigures/fSumTable.RDS")
+        rm(fileSummary, fileSummaryTable, colorHeader, rgbChartreuse2, nrOfLinesTotal)
         
         
         #Quiz:       
@@ -241,7 +245,7 @@ cat(green("Data summary starting\n"))
 #=======================
 
   # Character removal
-        indivCharRemovalRegEx <- "[>|<|=|~|#|/|([0-9]+-[0-9]+)]" # clean characters and not word. Words, punct, emojis are done later at the level of tokenization
+        indivCharRemovalRegEx <- "[>|<|=|~|#|([0-9]+-[0-9]+)]" # clean characters and not word. Words, punct, emojis are done later at the level of tokenization
 
 # Df
         blogsDf <- blogsDf %>% 
