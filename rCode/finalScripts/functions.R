@@ -1,15 +1,25 @@
 # Feature plot function for DFM dataDFM and dataNGram
 
+######
+# dfName <- topFeatAllDf
+# titleFeatPlot <- "Integrated Dataset"
+# colorFeatPlot <- "chartreuse2"
+#####
+
         featPlotFun <- function(dfName, titleFeatPlot, colorFeatPlot){
-                      featPlot <- ggplot(dfName, aes(x = reorder(feat, -count), y=count)) + # reorder bars in descending order
-                                geom_bar(stat="identity", fill= colorFeatPlot) +
+                      featPlot <- ggplot(dfName, aes(x = reorder(feat, count), y=count)) + # reorder bars in ascending order
+                          geom_bar(stat="identity", fill= colorFeatPlot) +
                                 theme_minimal() +
                                 labs(
-                                    x = "Words"
+                                    x = ""
                                     ) +
                                 scale_y_continuous(name = "Frequency", labels = scales::number) +
                                 theme(axis.text.x = element_text(angle = 90))
                       
+                        # Flip coordinate to be able to read better the labels
+                        featPlot <- featPlot + coord_flip() 
+                      
+                # Send to Plotly
                       featPlot <- ggplotly(
                         featPlot,
                         tooltip = "count"
@@ -18,8 +28,8 @@
                       featPlot <- featPlot %>%
                           add_annotations(
                             text = ~unique(titleFeatPlot),
-                            x = 0.14,
-                            y = 1.1,
+                            x = 0.14, 
+                            y = 1.15, # origin 1.1
                             yref = "paper",
                             xref = "paper",
                             xanchor = "left",
@@ -31,7 +41,13 @@
         }
 
 # Integrated pannel plot for n-gram : 4 plots (integrated dataset, blogs, news, twitts)
-        
+
+###
+        # nGram <- 3
+        # titleNGramPannelPlot <- "15 Top Features: n-grams 3"
+        # marginPannelPlot <- 0.1 # was 0.3, should be 0.1 for ngram3
+###
+               
         nGramPlotFun <- function(nGram, titleNGramPannelPlot, marginPannelPlot){
                 # marginPannelPlot enable to have enough space if the nr of words are increased on the graph
                 # tokens created on the base of the nGram entered
@@ -74,7 +90,7 @@
                 topFeatNewsDf <- data.frame(topFeatNewsNames, topFeatNews)%>% rename(feat = topFeatNewsNames) %>% rename(count = topFeatNews) %>% mutate(type="News")
                 topFeatTwittsDf <- data.frame(topFeatTwittsNames, topFeatTwitts)%>% rename(feat = topFeatTwittsNames) %>% rename(count = topFeatTwitts) %>% mutate(type="Twitts")
 
-                # Feature plots
+        # Individual Feature plots
                 # Call function
                 
                 integratedFeatPlot <- featPlotFun(topFeatAllDf, "Integrated Dataset", "chartreuse2")
@@ -88,10 +104,16 @@
                 
                 twittsFeatPlot <- featPlotFun(topFeatTwittsDf, "Twitts", "seagreen")
                 #twittsFeatPlot
-                 
+                
+        # Pannel plot
+         
                 pannelFeatPlot <- subplot(integratedFeatPlot, blogsFeatPlot, newsFeatPlot, twittsFeatPlot,  
-                                nrows = 2, margin = marginPannelPlot) %>%
-                        layout(title= titleNGramPannelPlot, margin = 0.1)
+                                nrows = 2, margin = marginPannelPlot) 
+                        # %>% layout(title= titleNGramPannelPlot, margin = 0.1)  : no need of title in the tab version of the report
+                
+                ###
+                #pannelFeatPlot
+                ###
                 
                 return(pannelFeatPlot)
                 
@@ -140,6 +162,7 @@
         }
         
 #nGramTables
+        # I cannot use the same procedure than above, subsetting dfm, because all tables of one n-grams will be the same given the fact that it's not based on frequency (just displaying the words) unlike bar plot
         nGramTableFun <- function(nGram, maxTableRows){
                        cat(green("Table n-grams -> Tokenization for the n-grams value: ", nGram,"\n"))
         

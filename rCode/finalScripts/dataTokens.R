@@ -2,12 +2,12 @@
         cat(green("Running: 'dataTokens.r'\n"))
         cat(green("Tokenization of the whole corpus will start\n"))
         
-        # Conver to lower case
-        toksCAll <- tokens_tolower(toksCAll)
-        
         # Tokenization + remove punctuation + remove emoji + numbers
                 # Individual characters like # or other are removed before creating the corpus, in the individual Df (see dataLoad)
         toksCAll <- tokens(cAll, remove_punct = TRUE, remove_symbols = TRUE, remove_numbers = TRUE, remove_url = TRUE, remove_separators = TRUE) # https://quanteda.io/reference/tokens.html
+        
+        # Conver to lower case
+        toksCAll <- tokens_tolower(toksCAll)
         
         # Check
                 #head(toksCAll)
