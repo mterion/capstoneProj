@@ -16,13 +16,14 @@
         
 # Remove stop words
         toksCAll <- tokens_remove(toksCAll, pattern = stopwords("en"), padding = TRUE)
-                # padding = TRUE means that the lenght of doc will not be changed
+                # padding = TRUE means that the lenght of doc will not be changed, position indices kept, bec word replaced with ""
         
                 # check
-                # head(toksCAll)       # Position indices kept, bec word replaced with ""
+                # head(toksCAll)       
                 
 # Remove dirty words
-
+        cat(green("Clearing bad words, unsignificant words and urls in tokens\n"))
+        
         # download.file('https://raw.githubusercontent.com/shutterstock/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/master/en',
                         # "./data/rawData/dirtyWord.txt")
                 
@@ -33,7 +34,7 @@
 # Remove unsignificant words
         unsigWords <- c(
                 "rt", # people type "RT" at the beginning of a Tweet to indicate that they are re-posting someone else's content.
-                ">", "<", "=", "~", "#"
+                ">", "<", "=", "~", "#", "g", "mg", "th", "rd", "st", "nd" # g for gram, mg also removed, th century: th removed
         )
         unsigWordsDf <- data.frame(unsigWords, stringsAsFactors = F) %>%
                 rename(word = unsigWords)
@@ -41,4 +42,37 @@
         toksCAll <- tokens_remove(toksCAll, pattern = unsigWordsDf$word, valuetype = "fixed", padding=TRUE ) # fixed for exact matching
         rm(unsigWords, unsigWordsDf)
 
-# Subset toksCAll for later use (analyse waged at 4 level: all and on each of the 3 blogs, news, twitts)       
+#Removing url
+        # Removing token with domain names at then end (ex: .com...)
+                # It was done because the url quanteda filter left some url names, with for example namex.com with .com at the end 
+                # fileUrl <- "https://data.iana.org/TLD/tlds-alpha-by-domain.txt"
+                # download.file(fileUrl, destfile = "./data/rawData/domainName.txt")
+        domainNamesDf <- read.table("./data/rawData/domainName.txt", sep = "\n", quote = "", header = F, colClasses = "character", encoding="UTF-8")
+        
+        domainNamesDf <- domainNamesDf %>%
+                rename(names = V1) %>%
+                mutate(names = tolower(names)) %>%
+                mutate(regEx = paste0("(.*).", names,"$"))
+                        #head(domainNamesDf)
+        
+        toksCAll <- tokens_remove(toksCAll, pattern = domainNamesDf$regEx, valuetype = "regex", padding=TRUE ) # fixed for exact matching
+                # checks:
+                        # kw_domainNames <- kwic(toksCAll, pattern =  "*.com")
+                        # head(kw_domainNames)
+                        # kw_domainNames1 <- kwic(toksCAll1, pattern =  "*.com")
+                        # head(kw_domainNames1)
+         rm(domainNamesDf)              
+        
+#==========================        
+# Subset toksCAll for later use (analyse waged at 4 level: all and on each of the 3 blogs, news, twitts)
+#========================== 
+# tokens_subset        
+        
+        toksCBlogs <- tokens_subset(toksCAll, type == "blogs")
+        toksCNews <- tokens_subset(toksCAll, type == "news")
+        toksCTwitts <- tokens_subset(toksCAll, type == "twitts")
+                # head(toksCAll); head(toksCBlogs); head(toksCNews); head(toksCTwitts);
+        
+
+
+        

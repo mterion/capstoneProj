@@ -73,7 +73,7 @@ After following this pre-processing sequence, the data contained in the corpus w
 ### 2.2 Methods
 ### 2.3 Analysis
 ### 2.3.1 Exploratory analysis 
-#### N-grams bar plots {.tabset}
+#### n-grams bar plots {.tabset}
 N-grams are extensively used in natural language processing tasks; they are a set of co-occuring words within a given window. For example, if N = 1, all words of the corpus will be listed one after the other. If N = 2, it will take the word and one word forward, aggregate them and move to the next world. 
 
 Here is an example for N = 2, the sentence being "here is an ngram demo": 
@@ -103,7 +103,7 @@ For this research, the values of N = 1, N= 2, N = 3 were considered. A pannel pl
 ``` 
 
 
-#### N-grams tables {.tabset}
+#### n-grams tables {.tabset}
 To facilitate an in depth analysis of the data and its structure, the following table provides a detailed review of the 50'000 most frequent features for each source, across the three N-grams values.
 
 ##### n1A
@@ -168,7 +168,8 @@ To facilitate an in depth analysis of the data and its structure, the following 
 ``` 
 
 
-
+#### Number of unique words 
+The number of unique words needed to cover a certain percentage of all word instances in the language considered can be seen in the following table. It requires for example xxx unique words to cover 90% of all word instances in the documents studied.
 
 
 

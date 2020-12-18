@@ -251,24 +251,24 @@ cat(green("Data summary starting\n"))
         blogsDf <- blogsDf %>% 
                 rename(text = as.character.blogsLines.) %>%
                 mutate(text = as.character(text)) %>%
-                mutate(text = stri_replace_all_regex(text, '\"', '')) %>% # use stringi because much faster than gsub   
-                mutate(text = stri_replace_all_regex(text, indivCharRemovalRegEx , "")) %>% 
+                mutate(text = stri_replace_all_regex(text, '\"', ' ')) %>% # use stringi because much faster than gsub   
+                mutate(text = stri_replace_all_regex(text, indivCharRemovalRegEx , " ")) %>% #need to replace with one space, if not will make a word out of 2 word when removing the unwanted char
                 mutate(doc_id = "enBlogs") %>%
                 mutate(type = "blogs")
         
         newsDf <- newsDf %>% 
                 rename(text = as.character.newsLines.) %>%
                 mutate(text = as.character(text)) %>%         
-                mutate(text = stri_replace_all_regex(text, '\"', '')) %>%
-                mutate(text = stri_replace_all_regex(text, indivCharRemovalRegEx , "")) %>% 
+                mutate(text = stri_replace_all_regex(text, '\"', ' ')) %>%
+                mutate(text = stri_replace_all_regex(text, indivCharRemovalRegEx , " ")) %>% 
                 mutate(doc_id = "enUSNews") %>%
                 mutate(type = "news")
         
         twitterDf <- twitterDf %>%
                 rename(text = as.character.twitterLines.) %>%
                 mutate(text = as.character(text)) %>%            
-                mutate(text = stri_replace_all_regex(text, '\"', '')) %>%
-                mutate(text = stri_replace_all_regex(text, indivCharRemovalRegEx , "")) %>% 
+                mutate(text = stri_replace_all_regex(text, '\"', ' ')) %>%
+                mutate(text = stri_replace_all_regex(text, indivCharRemovalRegEx , " ")) %>% 
                 mutate(doc_id = "enTwitts") %>%
                 mutate(type = "twitts")
         
@@ -321,7 +321,7 @@ cat(green("Individual corpuses merged into one large corpus 'cAll'\n"))
 
 # Clear the deck from unneeded files
         rm(cBlogs, cNews, cTwitts)
-        rm(blogsDf, newsDf, twitterDf, blogsLines, newsLines, twitterLines)
+        rm(blogsDf, newsDf, twitterDf, blogsLines, newsLines, twitterLines, indivCharRemovalRegEx)
                 
         # I remove the original individual base corpus to avoid mixing them later on
                 # I will use subset() to work on them individually

@@ -41,12 +41,11 @@
         }
 
 # Integrated pannel plot for n-gram : 4 plots (integrated dataset, blogs, news, twitts)
-
-###
-        # nGram <- 3
-        # titleNGramPannelPlot <- "15 Top Features: n-grams 3"
-        # marginPannelPlot <- 0.1 # was 0.3, should be 0.1 for ngram3
-###
+                ###
+                        # nGram <- 3
+                        # titleNGramPannelPlot <- "15 Top Features: n-grams 3"
+                        # marginPannelPlot <- 0.1 # was 0.3, should be 0.1 for ngram3
+                ###
                
         nGramPlotFun <- function(nGram, titleNGramPannelPlot, marginPannelPlot){
                 # marginPannelPlot enable to have enough space if the nr of words are increased on the graph
@@ -162,33 +161,35 @@
         }
         
 #nGramTables
+        ###
+        # nGram <- 2
+        # maxTableRows <- 20
+        ###
+        
         # I cannot use the same procedure than above, subsetting dfm, because all tables of one n-grams will be the same given the fact that it's not based on frequency (just displaying the words) unlike bar plot
         nGramTableFun <- function(nGram, maxTableRows){
                        cat(green("Table n-grams -> Tokenization for the n-grams value: ", nGram,"\n"))
         
                         # Global vars
-                        
                         nGram <<- nGram # makes it a global var so that my 2nd fun will find its value
                         maxTableRows <<- maxTableRows
                         
                         # tokens created on the base of the nGram entered
                         toksNGramXAll <- tokens_ngrams(toksCAll, nGram)
-                                # head(toksNGramXAll)
+                        ##
+                                toksNGramXBlogs <- tokens_ngrams(toksCBlogs, nGram)
+                                toksNGramXNews <- tokens_ngrams(toksCNews, nGram)
+                                toksNGramXTwitts <- tokens_ngrams(toksCTwitts, nGram)
+                                        # head(toksNGramXAll); head(toksNGramXBlogs); head(toksNGramXNews); head(toksNGramXTwitts)
+                                
                         # dfm creation
                         cat(green("Creation of document-feature matrix\n"))
                         dfmToksNGramXAll <- dfm(toksNGramXAll, remove="")
-                                # head(dfmToksNGramXAll)
-                        
-                        # Dfm subset for 3 types
-                                # Blogs
-                                dfmToksNGramXBlogs <- dfm_subset(dfmToksNGramXAll, type == "blogs")
-                        
-                                # News
-                                dfmToksNGramXNews <- dfm_subset(dfmToksNGramXAll, type == "news")
-                        
-                                # Twitts
-                                dfmToksNGramXTwitts <- dfm_subset(dfmToksNGramXAll, type =="twitts")
-                                        # head(dfmToksNGramXBlogs); head(dfmToksNGramXNews); head(dfmToksNGramXTwitts)
+                        ##
+                                dfmToksNGramXBlogs <- dfm(toksNGramXBlogs, remove="")
+                                dfmToksNGramXNews <- dfm(toksNGramXNews, remove="")
+                                dfmToksNGramXTwitts <- dfm(toksNGramXTwitts, remove="")
+                                        # head(dfmToksNGramXAll); head(dfmToksNGramXBlogs); head(dfmToksNGramXNews); head(dfmToksNGramXTwitts); 
                         
                 # Plotly tables
                         # All
@@ -203,7 +204,7 @@
                         # Blogs
                         cat(green("     Creation of n-grams table: Blogs\n"))
                         rgbSteelblue <- "rgb(70,130,180)"
-                        nGramTableBlogs <- nGramIndivTableFun(dfmToksNGramXAll, typeDoc = "Blogs", colorHeader = rgbSteelblue)
+                        nGramTableBlogs <- nGramIndivTableFun(dfmToksNGramXBlogs, typeDoc = "Blogs", colorHeader = rgbSteelblue)
                         print(nGramTableBlogs)
                         cat(green("     Saving of n-grams table: Blogs\n"))
                         saveRDS(nGramTableBlogs, paste0("./figures/finalFigures/nGram_", nGram, "_TableBlogs.RDS"))
@@ -212,7 +213,7 @@
                         # News
                         cat(green("     Creation of n-grams table: News\n"))
                         rgbSalmon <- "rgb(250,128,114)"
-                        nGramTableNews <- nGramIndivTableFun(dfmToksNGramXAll, typeDoc = "News", colorHeader = rgbSalmon)
+                        nGramTableNews <- nGramIndivTableFun(dfmToksNGramXNews, typeDoc = "News", colorHeader = rgbSalmon)
                         print(nGramTableNews)
                         cat(green("     Saving of n-grams table: News\n"))
                         saveRDS(nGramTableNews, paste0("./figures/finalFigures/nGram_", nGram, "_TableNews.RDS"))
@@ -221,7 +222,7 @@
                         # Twitts
                         cat(green("     Creation of n-grams table: Twitts\n"))
                         rgbSeagreen <- "rgb(46,139,87)"
-                        nGramTableTwitts <- nGramIndivTableFun(dfmToksNGramXAll, typeDoc = "Twitts", colorHeader = rgbSeagreen)
+                        nGramTableTwitts <- nGramIndivTableFun(dfmToksNGramXTwitts, typeDoc = "Twitts", colorHeader = rgbSeagreen)
                         print(nGramTableTwitts)
                         cat(green("     Saving of n-grams Twitts: All\n"))
                         saveRDS(nGramTableTwitts, paste0("./figures/finalFigures/nGram_", nGram, "_TableTwitts.RDS"))

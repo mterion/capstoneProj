@@ -42,10 +42,38 @@
 
         # Save / read
         saveRDS(toksCAll, "./data/processedData/toksCAll.RDS")
+        saveRDS(toksCBlogs, "./data/processedData/toksCBlogs.RDS")
+        saveRDS(toksCNews, "./data/processedData/toksCNews.RDS")
+        saveRDS(toksCTwitts, "./data/processedData/toksCTwitts.RDS")
+        
         toksCAll <- readRDS("./data/processedData/toksCAll.RDS")
+        toksCBlogs <- readRDS("./data/processedData/toksCBlogs.RDS")
+        toksCNews <- readRDS("./data/processedData/toksCNews.RDS")
+        toksCTwitts <- readRDS("./data/processedData/toksCTwitts.RDS")
 
 # NGrams operations
         source("./rCode/finalScripts/dataNGram.R")
+        
+
+        readRDS("./figures/finalFigures/pannelFeatPlotNGram1.RDS")
+        readRDS("./figures/finalFigures/pannelFeatPlotNGram2.RDS")
+        readRDS("./figures/finalFigures/pannelFeatPlotNGram3.RDS")
+        
+        readRDS("./figures/finalFigures/nGram_1_TableAll.RDS")
+        readRDS("./figures/finalFigures/nGram_1_TableBlogs.RDS")
+        readRDS("./figures/finalFigures/nGram_1_TableNews.RDS")
+        readRDS("./figures/finalFigures/nGram_1_TableTwitts.RDS")
+        
+        readRDS("./figures/finalFigures/nGram_2_TableAll.RDS")
+        readRDS("./figures/finalFigures/nGram_2_TableBlogs.RDS")
+        readRDS("./figures/finalFigures/nGram_2_TableNews.RDS")
+        readRDS("./figures/finalFigures/nGram_2_TableTwitts.RDS")
+        
+        readRDS("./figures/finalFigures/nGram_3_TableAll.RDS")
+        readRDS("./figures/finalFigures/nGram_3_TableBlogs.RDS")
+        readRDS("./figures/finalFigures/nGram_3_TableNews.RDS")
+        readRDS("./figures/finalFigures/nGram_3_TableTwitts.RDS")
+
 
 # Document-feature matrix and feature co-occurence matrix
         #source("./rCode/rawCode/dfm_fcm.R")
