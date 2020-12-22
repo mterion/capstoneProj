@@ -1,10 +1,10 @@
 # Feature plot function for DFM dataDFM and dataNGram
 
-######
-# dfName <- topFeatAllDf
-# titleFeatPlot <- "Integrated Dataset"
-# colorFeatPlot <- "chartreuse2"
-#####
+        ######
+        # dfName <- topFeatAllDf
+        # titleFeatPlot <- "Integrated Dataset"
+        # colorFeatPlot <- "chartreuse2"
+        #####
 
         featPlotFun <- function(dfName, titleFeatPlot, colorFeatPlot){
                       featPlot <- ggplot(dfName, aes(x = reorder(feat, count), y=count)) + # reorder bars in ascending order
@@ -164,10 +164,15 @@
         ###
         # nGram <- 2
         # maxTableRows <- 20
+        # tokenDataAll <- toksCAll
+        # tokenDataBlogs <- toksCBlogs
+        # tokenDataNews <- toksCNews
+        # tokenDataTwits<- toksCTwitts
+        # typeData <- P
         ###
         
         # I cannot use the same procedure than above, subsetting dfm, because all tables of one n-grams will be the same given the fact that it's not based on frequency (just displaying the words) unlike bar plot
-        nGramTableFun <- function(nGram, maxTableRows){
+        nGramTableFun <- function(tokenDataAll, tokenDataBlogs, tokenDataNews, tokenDataTwits, nGram, maxTableRows, typeData =""){
                        cat(green("Table n-grams -> Tokenization for the n-grams value: ", nGram,"\n"))
         
                         # Global vars
@@ -175,11 +180,11 @@
                         maxTableRows <<- maxTableRows
                         
                         # tokens created on the base of the nGram entered
-                        toksNGramXAll <- tokens_ngrams(toksCAll, nGram)
+                        toksNGramXAll <- tokens_ngrams(tokenDataAll, nGram)
                         ##
-                                toksNGramXBlogs <- tokens_ngrams(toksCBlogs, nGram)
-                                toksNGramXNews <- tokens_ngrams(toksCNews, nGram)
-                                toksNGramXTwitts <- tokens_ngrams(toksCTwitts, nGram)
+                                toksNGramXBlogs <- tokens_ngrams(tokenDataBlogs, nGram)
+                                toksNGramXNews <- tokens_ngrams(tokenDataNews, nGram)
+                                toksNGramXTwitts <- tokens_ngrams(tokenDataTwits, nGram)
                                         # head(toksNGramXAll); head(toksNGramXBlogs); head(toksNGramXNews); head(toksNGramXTwitts)
                                 
                         # dfm creation
@@ -198,7 +203,7 @@
                         nGramTableAll <- nGramIndivTableFun(dfmToksNGramXAll, typeDoc = "Integrated Dataset", colorHeader = rgbChartreuse2)
                         print(nGramTableAll)
                         cat(green("     Saving of n-grams table: All\n"))
-                        saveRDS(nGramTableAll, paste0("./figures/finalFigures/nGram_", nGram, "_TableAll.RDS"))
+                        saveRDS(nGramTableAll, paste0("./figures/finalFigures/nGram_", nGram, "_TableAll", typeData, ".RDS"))
                         
                         
                         # Blogs
@@ -207,7 +212,7 @@
                         nGramTableBlogs <- nGramIndivTableFun(dfmToksNGramXBlogs, typeDoc = "Blogs", colorHeader = rgbSteelblue)
                         print(nGramTableBlogs)
                         cat(green("     Saving of n-grams table: Blogs\n"))
-                        saveRDS(nGramTableBlogs, paste0("./figures/finalFigures/nGram_", nGram, "_TableBlogs.RDS"))
+                        saveRDS(nGramTableBlogs, paste0("./figures/finalFigures/nGram_", nGram, "_TableBlogs", typeData, ".RDS"))
                         
                         
                         # News
@@ -216,7 +221,7 @@
                         nGramTableNews <- nGramIndivTableFun(dfmToksNGramXNews, typeDoc = "News", colorHeader = rgbSalmon)
                         print(nGramTableNews)
                         cat(green("     Saving of n-grams table: News\n"))
-                        saveRDS(nGramTableNews, paste0("./figures/finalFigures/nGram_", nGram, "_TableNews.RDS"))
+                        saveRDS(nGramTableNews, paste0("./figures/finalFigures/nGram_", nGram, "_TableNews", typeData, ".RDS"))
                         
                         
                         # Twitts
@@ -225,7 +230,7 @@
                         nGramTableTwitts <- nGramIndivTableFun(dfmToksNGramXTwitts, typeDoc = "Twitts", colorHeader = rgbSeagreen)
                         print(nGramTableTwitts)
                         cat(green("     Saving of n-grams Twitts: All\n"))
-                        saveRDS(nGramTableTwitts, paste0("./figures/finalFigures/nGram_", nGram, "_TableTwitts.RDS"))
+                        saveRDS(nGramTableTwitts, paste0("./figures/finalFigures/nGram_", nGram, "_TableTwitts", typeData, ".RDS"))
                         
                         rm(nGram)# remove global var
                         gc() # garbage collection

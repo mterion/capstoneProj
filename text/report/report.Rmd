@@ -32,8 +32,14 @@ The research question addressed is : "How can an efficient text predicitve model
 ## 2. Sections
 ### 2.1 Data
 #### 2.1.1 Raw data
-The data is composed of more that four millions documents, the extact total being 4'269'678. The following table indicates the different statistics related to the three different file sources. The results highlight that some blog documents appear to be very long when compared to the medians of all types of documents.
+```{r rawNr, include = FALSE}
+nrOfLinesTotal <- format(readRDS("./figures/finalFigures/nrOfLinesTotal.RDS"), big.mark = "'")
+nrOfWordsTotal <- format(readRDS("./figures/finalFigures/nrOfWordsTotal.RDS"), big.mark = "'")
+```
+The data is composed of more that four millions documents, the extact total being `r nrOfLinesTotal`. These documents contain `r nrOfWordsTotal` words. The following table indicates the different statistics related to the three different file sources. The results highlight that some blog documents appear to be very long when compared to the medians of all types of documents.
+
 ```{r fileSummaryTable, fig.height= 2.05 }
+rm(nrOfLinesTotal, nrOfWordsTotal)
 readRDS("./figures/finalFigures/fSumTable.RDS")
 ```
 
@@ -56,34 +62,35 @@ readRDS("./figures/finalFigures/violinWordCount.RDS")
 #### 2.1.3 Data pre-processing
 Before conducting analysis and developping models, the data needed to be pre-processed. The sequence applied is the following:
 
-* Non-wanted character removals: All non-essential characters were removed with regular expressions to facilitate analysis and model development (e.g.: ">,<, =, ~, #"). The numbers separated by "-" were also deleted.
 * Corpus creation: All documents from the three different sources were merged into a single corpus.
 * Tokenization: All texts contained in the corpus were separated into smaller units called tokens which can be words, characters or subwords.
 * Token conversion: Token were converted to lower case
-* Token removal
-    + Punctuation, symbols such as emoji, url, separators and isolated numbers were removed.
+* Token cleaning:
+    + All Punctuation, symbols such as emoji, url, separators and isolated numbers were removed.
+    + Urls removal: a second url filter was applied by considering 1504 [domain names](https://data.iana.org/TLD/tlds-alpha-by-domain.txt)
+    + All existing tokens were split on punctuations marks or symbols and the separators removed. (e.g. "2.2" would make two tokens of "2")
+    + All tokens consisting of numbers were removed.
     + All profanity words were deleted. The profanity filter built used this [data source](https://raw.githubusercontent.com/shutterstock/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/master/en)
-    + All stopwords were removed. 
-    + A personal dictionary was built to contain other unsignificant words needing to be discarded
-    
+    + A personal dictionary was built to contain other unsignificant words needing to be discarded (e.g. "mg", "rd"...)
+    + All stopwords were removed for exploratory analysis, but a token data set including tokens with stop words was kept for later model development purposes
    
-After following this pre-processing sequence, the data contained in the corpus were deemed ready for further analysis and model development.
+After following this pre-processing sequence, the data contained in the corpus was deemed ready for further analysis and model development.
 
 
 ### 2.2 Methods
 ### 2.3 Analysis
 ### 2.3.1 Exploratory analysis 
 #### n-grams bar plots {.tabset}
-N-grams are extensively used in natural language processing tasks; they are a set of co-occuring words within a given window. For example, if N = 1, all words of the corpus will be listed one after the other. If N = 2, it will take the word and one word forward, aggregate them and move to the next world. 
+N-grams are extensively used in natural language processing tasks; they are a set of co-occuring words within a given window. For example, if n-grams = 1, all words of the corpus will be listed one after the other. If n-grams = 2, it will take the word and one word forward, aggregate them and move to the next world. 
 
-Here is an example for N = 2, the sentence being "here is an ngram demo": 
+Here is an example for n-grams = 2, the sentence being "here is an ngram demo": 
 
 * here_is
 * is_an
 * an_ngram
 * ngram_demo
 
-For this research, the values of N = 1, N= 2, N = 3 were considered. A pannel plot of the 15 most frequent features for each source is displayed underneath.
+For this research, the values of n-grams = 1, 2, 3 were considered. The following pannel plot display 15 of the most frequent features for each n-grams value and data source.
 
 
 ##### nGrams1
@@ -104,7 +111,10 @@ For this research, the values of N = 1, N= 2, N = 3 were considered. A pannel pl
 
 
 #### n-grams tables {.tabset}
-To facilitate an in depth analysis of the data and its structure, the following table provides a detailed review of the 50'000 most frequent features for each source, across the three N-grams values.
+To enable an in depth analysis of the data and its structure, the following table provides a detailed review of the 50'000 most frequent features for each source, across the three n-grams values. 
+
+The characteristics of the languages from Twitts where the same words can be repeated a few consecutive time (e.g. Fun, fun, fun!) should be noted. Such characteristics are totally absent in news, where the language is more formal. The same occur with word abbreviations, for example "u" versus "you".
+
 
 ##### n1A
 ```{r n1A}
@@ -168,18 +178,63 @@ To facilitate an in depth analysis of the data and its structure, the following 
 ``` 
 
 
-#### Number of unique words 
-The number of unique words needed to cover a certain percentage of all word instances in the language considered can be seen in the following table. It requires for example xxx unique words to cover 90% of all word instances in the documents studied.
+#### n-grams tables with stop words {.tabset}
+To understand the particularities of the content of the different sources, stop words (e.g. a, and, but, how, etc.) were removed in the previous tables. Neverthelesse, a predictive model that will help the user predict the next word when using his mobile device requires to integrate stop words in the model prediction. Therefore, the next table provide an overview of the integrated dataset, with the inclusion of stop words.
 
 
+##### n1ASW
+```{r n1ASW}
+        readRDS("./figures/finalFigures/nGram_1_TableAllSW.RDS")
+``` 
+
+##### n2ASW
+```{r n2ASW}
+        readRDS("./figures/finalFigures/nGram_2_TableAllSW.RDS")
+``` 
+
+##### n3ASW
+```{r n3ASW}
+        readRDS("./figures/finalFigures/nGram_3_TableAllSW.RDS")
+``` 
 
 
+#### Number of unique words
+```{r totalNrWord, include = FALSE}
+nrWordC <- format(readRDS("./figures/finalFigures/nrWordC.RDS"), big.mark = "'")
+coverage0.5 <- format(readRDS("./figures/finalFigures/coverage0.5.RDS"), big.mark = "'")
+coverage0.9 <- format(readRDS("./figures/finalFigures/coverage0.9.RDS"), big.mark = "'")
+```
+The number of unique words in the corpus is `r nrWordC`. The amount of unique words (including stop words) needed to cover a percentage of all word instances mentioned in this corpus can be seen in the following table. It requires for example `r coverage0.5` unique words to cover 50% of all word instances and `r coverage0.9` unique words to cover 90% of all word instances present in all documents studied.
+
+```{r coverageTable}
+rm(nrWordC, coverage0.5, coverage0.9)
+readRDS("./figures/finalFigures/coverageTable.RDS")
+```
 
 ### 2.4 Results
+The different tasks (1-2) answers are the following:
+
+1. **How do you evaluate how many of the words come from foreign languages?** 
+This can be done by using a foreign language dictionary and filtering out the words that belongs to it. It goes in the same direction than the work done with the removal of profanity words on the base of a special dictionary.
+
+2. **Can you think of a way to increase the coverage -- identifying words that may not be in the corpora or using a smaller number of words in the dictionary to cover the same number of phrases?**
+     i) Using a smaller number of words in the dictionary to cover the same number of phrase can simply be done by removing the dictionary low-frequency words. It can also be done by reducing the number of low frequency words by stemming.
+     i) Increasing the coverage can be done by comparing the corpus dictionary with a full language dictionary, taking the delta and thinking about why this words were not in our original corpus. This will give indication at whether we should include other types of data sources (blogs of different types, etc.) in our actual corpus.
+     
+     
+3. **How can you efficiently store an n-gram model (think Markov Chains)?** The efficient storage of a markov chain model is that it stores the probability in a sequence of events based on the state attained in the previous event. Thus the clear advantage it promote efficiency in the storage of the model. It suits perfectly for sequence processing as done in natural language processing.
+     
+4. **How can you use the knowledge about word frequencies to make your model smaller and more efficient?**
 
 
- * Corpus size
- * Balance, representativeness and sampling
+5. **How many parameters do you need (i.e. how big is n in your n-gram model)?**
+
+6. **Can you think of simple ways to "smooth" the probabilities (think about giving all n-grams a non-zero probability even if they aren't observed in the data) ?**
+
+7. **How do you evaluate whether your model is any good?**
+
+8. **How can you use backoff models to estimate the probability of unobserved n-grams?**
+
  
 
 
@@ -191,7 +246,8 @@ The number of unique words needed to cover a certain percentage of all word inst
 ## 4. Appendix
 ### 4.1 Details of data and process
 ### 4.2 References
-[data source](https://raw.githubusercontent.com/shutterstock/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/master/en)
+[Profanity list](https://data.iana.org/TLD/tlds-alpha-by-domain.txt)
+[Data source](https://raw.githubusercontent.com/shutterstock/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/master/en)
 
 
 

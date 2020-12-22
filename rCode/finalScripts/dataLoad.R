@@ -49,8 +49,8 @@ cat(green("Data summary starting\n"))
         blogsLinesNr <- length(blogsLines)
         newsLinesNr <- length(newsLines)
         twitterLinesNr <- length(twitterLines)
-        nrOfLinesTotal <-  blogsLinesNr + newsLinesNr + twitterLinesNr
-        nrOfLinesTotal
+        nrOfLinesTotal <-  sum(blogsLinesNr,newsLinesNr,twitterLinesNr)
+                saveRDS(nrOfLinesTotal, "./figures/finalFigures/nrOfLinesTotal.RDS")
         
 # Length of the longest lines
         # Create another vect with nr char in vector
@@ -67,6 +67,8 @@ cat(green("Data summary starting\n"))
         blogsWordNr <- stri_count_words(blogsLines)
         newsWordNr <- stri_count_words(newsLines)
         twitterWordNr <- stri_count_words(twitterLines)
+        nrOfWordsTotal <- sum(blogsWordNr,newsWordNr,twitterWordNr)
+                saveRDS(nrOfWordsTotal, "./figures/finalFigures/nrOfWordsTotal.RDS")
         
         # Plot
                 #Make df
@@ -207,20 +209,7 @@ cat(green("Data summary starting\n"))
         rm(fileSummary, fileSummaryTable, colorHeader, rgbChartreuse2, nrOfLinesTotal)
         
         
-        #Quiz:       
-        # Question 4: In the en_US twitter data set,Divide the number of lines where the word "love" (all lowercase) occurs by the number of lines the word "hate" (all lowercase) occurs, about what do you get?
-                
-                # sum(as.numeric(grep("love", twitterLines)))/sum(as.numeric(grep("hate", twitterLines)))
-        
-        # Q5: The one tweet in the en_US twitter data set that matches the word “biostats” says what?
-        
-                # grep("biostats", twitterLines, value = TRUE)
-        
-        # Q6: Question 6: How many tweets have the exact characters "A computer once beat me at chess, but it was no match for me at kickboxing". (I.e. the line matches those characters exactly.)
-                
-                # length(grep("A computer once beat me at chess, but it was no match for me at kickboxing", twitterLines))
-
-
+       
 #=======================
 # DataFrame creation
 #=======================
@@ -245,30 +234,30 @@ cat(green("Data summary starting\n"))
 #=======================
 
   # Character removal
-        indivCharRemovalRegEx <- "[>|<|=|~|#|([0-9]+-[0-9]+)]" # clean characters and not word. Words, punct, emojis are done later at the level of tokenization
+        #indivCharRemovalRegEx <- "[>|<|=|~|#|([0-9]+-[0-9]+)|%]" # clean characters and not word. Words, punct, emojis are done later at the level of tokenization
 
 # Df
         blogsDf <- blogsDf %>% 
                 rename(text = as.character.blogsLines.) %>%
                 mutate(text = as.character(text)) %>%
-                mutate(text = stri_replace_all_regex(text, '\"', ' ')) %>% # use stringi because much faster than gsub   
-                mutate(text = stri_replace_all_regex(text, indivCharRemovalRegEx , " ")) %>% #need to replace with one space, if not will make a word out of 2 word when removing the unwanted char
+                #mutate(text = stri_replace_all_regex(text, '\"', ' ')) %>% # use stringi because much faster than gsub   
+                #mutate(text = stri_replace_all_regex(text, indivCharRemovalRegEx , " ")) %>% #need to replace with one space, if not will make a word out of 2 word when removing the unwanted char
                 mutate(doc_id = "enBlogs") %>%
                 mutate(type = "blogs")
         
         newsDf <- newsDf %>% 
                 rename(text = as.character.newsLines.) %>%
                 mutate(text = as.character(text)) %>%         
-                mutate(text = stri_replace_all_regex(text, '\"', ' ')) %>%
-                mutate(text = stri_replace_all_regex(text, indivCharRemovalRegEx , " ")) %>% 
+                #mutate(text = stri_replace_all_regex(text, '\"', ' ')) %>%
+                #mutate(text = stri_replace_all_regex(text, indivCharRemovalRegEx , " ")) %>% 
                 mutate(doc_id = "enUSNews") %>%
                 mutate(type = "news")
         
         twitterDf <- twitterDf %>%
                 rename(text = as.character.twitterLines.) %>%
                 mutate(text = as.character(text)) %>%            
-                mutate(text = stri_replace_all_regex(text, '\"', ' ')) %>%
-                mutate(text = stri_replace_all_regex(text, indivCharRemovalRegEx , " ")) %>% 
+                #mutate(text = stri_replace_all_regex(text, '\"', ' ')) %>%
+                #mutate(text = stri_replace_all_regex(text, indivCharRemovalRegEx , " ")) %>% 
                 mutate(doc_id = "enTwitts") %>%
                 mutate(type = "twitts")
         
@@ -316,18 +305,19 @@ cat(green("Individual corpus created\n"))
 # Combine 3 corpus into 1 big corpus
         cAll <- cBlogs + cNews + cTwitts
                 summary(cAll)
+        saveRDS(cAll, "./data/processedData/cAll.RDS")
                 
 cat(green("Individual corpuses merged into one large corpus 'cAll'\n"))
 
 # Clear the deck from unneeded files
-        rm(cBlogs, cNews, cTwitts)
-        rm(blogsDf, newsDf, twitterDf, blogsLines, newsLines, twitterLines, indivCharRemovalRegEx)
+        rm(cBlogs, cNews, cTwitts, nrOfWordsTotal)
+        rm(blogsDf, newsDf, twitterDf, blogsLines, newsLines, twitterLines)
                 
         # I remove the original individual base corpus to avoid mixing them later on
                 # I will use subset() to work on them individually
 
 
-      
+
 
         
         

@@ -32,28 +32,52 @@
 
         rm(pannelFeatPlotNGram1, pannelFeatPlotNGram2, pannelFeatPlotNGram3)
 
-# Create nGram tables
+# Create nGram tables : NO PUNCTUATION
+        toksCBlogs <- readRDS("./data/processedData/toksCBlogs.RDS")
+        toksCNews <- readRDS("./data/processedData/toksCNews.RDS")
+        toksCTwitts <- readRDS("./data/processedData/toksCTwitts.RDS")
+        
         
         # Saved directly in the fun
         cat(green("Creation of tables for n-grams 1\n"))
-        nGramTableFun(nGram = 1, maxTableRows = 50000)
+        nGramTableFun(tokenDataAll =  toksCAll, tokenDataBlogs = toksCBlogs , tokenDataNews = toksCNews, tokenDataTwits = toksCTwitts, nGram = 1, maxTableRows = 5001)
         
         cat(green("Creation of tables for n-grams 2\n"))
-        nGramTableFun(nGram = 2, maxTableRows = 50000)
+        nGramTableFun(tokenDataAll =  toksCAll, tokenDataBlogs = toksCBlogs , tokenDataNews = toksCNews, tokenDataTwits = toksCTwitts, nGram = 2, maxTableRows = 5001)
         
         cat(green("Creation of tables for n-grams 3\n"))
-        nGramTableFun(nGram = 3, maxTableRows = 50000)
-        
-        rm(nGramTable_1_All, nGramTable_1_Blogs, nGramTable_1_News, nGramTable_1_Twitts)
-        rm(nGramTable_2_All, nGramTable_2_Blogs, nGramTable_2_News, nGramTable_2_Twitts)
-        rm(nGramTable_3_All, nGramTable_3_Blogs, nGramTable_3_News, nGramTable_3_Twitts)
+        nGramTableFun(tokenDataAll =  toksCAll, tokenDataBlogs = toksCBlogs , tokenDataNews = toksCNews, tokenDataTwits = toksCTwitts, nGram = 3, maxTableRows = 5001)
 
+        rm(toksCBlogs, toksCNews, toksCTwitts)
+        
+# Create nGram tables : WITH STWOPWORDS
+        memory.limit()
+        memory.limit(30000)
+        
+        toksCAllSW <- readRDS("./data/processedData/toksCAllSW.RDS")        
+        toksCBlogsSW <- readRDS("./data/processedData/toksCBlogsSW.RDS")
+        toksCNewsSW <- readRDS("./data/processedData/toksCNewsSW.RDS")
+        toksCTwittsSW <- readRDS("./data/processedData/toksCTwittsSW.RDS")
+        
+        # Saved directly in the fun
+        cat(green("Creation of tables for n-grams 1\n"))
+        nGramTableFun(tokenDataAll =  toksCAllSW, tokenDataBlogs = toksCBlogsSW , tokenDataNews = toksCNewsSW, tokenDataTwits = toksCTwittsSW, nGram = 1, maxTableRows = 5001, typeData = "SW")
+        
+        cat(green("Creation of tables for n-grams 2\n"))
+        nGramTableFun(tokenDataAll =  toksCAllSW, tokenDataBlogs = toksCBlogsSW , tokenDataNews = toksCNewsSW, tokenDataTwits = toksCTwittsSW, nGram = 2, maxTableRows = 5001, typeData = "SW")
+        
+        cat(green("Creation of tables for n-grams 3\n"))
+        nGramTableFun(tokenDataAll =  toksCAllSW, tokenDataBlogs = toksCBlogsSW , tokenDataNews = toksCNewsSW, tokenDataTwits = toksCTwittsSW, nGram = 3, maxTableRows = 5001, typeData = "SW")
+        
+        rm(toksCBlogsSW, toksCNewsSW, toksCTwittsSW)
 #===================================================
 # Unique words     
 #===================================================
 
 # How many unique words do you need in a frequency sorted dictionary to cover 50% of all word instances in the language? 90%?
-        toksNGram1CAll <- tokens_ngrams(toksCAll, 1)
+        # Watch out: Computation done on the corpus with stopWord!
+        toksCAllSW <- readRDS("./data/processedData/toksCAllSW.RDS")
+        toksNGram1CAll <- tokens_ngrams(toksCAllSW, 1)
         dfmToks1CAll <- dfm(toksNGram1CAll, remove="")
         head(dfmToks1CAll)
 
@@ -77,17 +101,20 @@
 
                                 
         nrWordC <- nrow(tableFeatFreq)
+                saveRDS(nrWordC, "./figures/finalFigures/nrWordC.RDS")
+        
         rowTitle <- "Unique word numbers"
         coverage0.1 <- sum(tableFeatFreq$cumSumDivTotalWord < 0.1)
         coverage0.2 <- sum(tableFeatFreq$cumSumDivTotalWord < 0.2)
         coverage0.3 <- sum(tableFeatFreq$cumSumDivTotalWord < 0.3)
         coverage0.4 <- sum(tableFeatFreq$cumSumDivTotalWord < 0.4)
         coverage0.5 <- sum(tableFeatFreq$cumSumDivTotalWord < 0.5)
+                saveRDS(coverage0.5, "./figures/finalFigures/coverage0.5.RDS")
         coverage0.6 <- sum(tableFeatFreq$cumSumDivTotalWord < 0.6)
         coverage0.7 <- sum(tableFeatFreq$cumSumDivTotalWord < 0.7)
         coverage0.8 <- sum(tableFeatFreq$cumSumDivTotalWord < 0.8)
         coverage0.9 <- sum(tableFeatFreq$cumSumDivTotalWord < 0.9)
-        
+                saveRDS(coverage0.9, "./figures/finalFigures/coverage0.9.RDS")
         
 # Plotly table
          rgbChartreuse2 <- "rgb(118,238,0)"
@@ -95,10 +122,10 @@
         
         coverageTable <- plot_ly(
               type = 'table',
-              columnwidth = c(110,50,50,50,50,50,50,50, 50, 50),
+              columnwidth = c(160,50,50,50,50,50,50,50, 50, 50),
               columnorder = c(1,2,3,4,5,6,7,8, 9, 10),
               header = list(
-                values = c("Integrated", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%"),
+                values = c("Integrated Data", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%"),
                 align = c("left", "center", "center", "center", "center", "center", "center", "center", "center", "center"),
                 line = list(width = 1, color = 'black'),
                 fill = list(color = colorHeader),
