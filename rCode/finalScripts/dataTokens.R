@@ -7,12 +7,6 @@
         saveRDS(toksCAll1, "./data/processedData/toksCAll1.RDS")
                 # head(toksCAll1, 3)
         
-        # Conver to lower case
-        toksCAll2 <- tokens_tolower(toksCAll1)
-        saveRDS(toksCAll2, "./data/processedData/toksCAll2.RDS")
-                rm(cAll,toksCAll, toksCAll1)
-                #head(toksCAll2, 3)
-        
         cat(green("Tokenization done, punctuation removed, lower case applied\n"))
         gc()
                 
@@ -32,28 +26,30 @@
                         # Correct regex with com example: "[^ ]+(\\.com)$"
 
         
-        toksCAll3 <- tokens_remove(toksCAll2, pattern = domainNamesDf$regEx, valuetype = "regex", padding=TRUE ) # fixed for exact matching
-        saveRDS(toksCAll3, "./data/processedData/toksCAll3.RDS")
-                rm(toksCAll2, domainNamesDf)
+        toksCAll2 <- tokens_remove(toksCAll1, pattern = domainNamesDf$regEx, valuetype = "regex", padding=TRUE ) # fixed for exact matching
+        saveRDS(toksCAll2, "./data/processedData/toksCAll2.RDS")
+                rm(toksCAll1, domainNamesDf)
                 # checks:
                         # kw_domainNames <- kwic(toksCAll, pattern =  "*.com")
                         # head(kw_domainNames)
-                        # head(toksCAll3, 3)
+                        # head(toksCAll2, 3)
          
-# Split composed tokens (example: "2.2" or "master-work") separated by a punctuation character
-        # Done in a 2 steps because regEx too long
-     toksCAll4 <- tokens_split(toksCAll3, separator = "[~|&|<|>|\\*|@|\\|%|[|]|\\^|:|,|-]", valuetype = "regex", remove_separator = TRUE)
-                head(toksCAll4, 3)
-                
-        toksCAll4 <- tokens_split(toksCAll4, separator = "[°|\"|+|=|/|_|(|)|\\.|?|`|;]", valuetype = "regex", remove_separator = TRUE)
-                #head(toksCAll4, 3)
-        saveRDS(toksCAll4, "./data/processedData/toksCAll4.RDS")
-                rm(toksCAll3)
-                # head(toksCAll4, 3)
+# # Split composed tokens (example: "2.2" or "master-work") separated by a punctuation character
+#         # Done in a 2 steps because regEx too long
+#      toksCAll4 <- tokens_split(toksCAll3, separator = "[~|&|<|>|\\*|@|\\|%|[|]|\\^|:|,|-]", valuetype = "regex", remove_separator = TRUE)
+#                 head(toksCAll4, 3)
+#                 
+#         toksCAll4 <- tokens_split(toksCAll4, separator = "[°|\"|+|=|/|_|(|)|\\.|?|`|;]", valuetype = "regex", remove_separator = TRUE)
+#                 #head(toksCAll4, 3)
+#         saveRDS(toksCAll4, "./data/processedData/toksCAll4.RDS")
+#                 rm(toksCAll3)
+#                 # head(toksCAll4, 3)
         
 # Remove token with numbers into them
                 # The one that arised from spliting on . or ,..
-        toksCAll5 <- tokens_select(toksCAll4, pattern = "([0-9]+)", selection="remove", valuetype = "regex", padding = TRUE)
+
+# changed 3 into 2
+        toksCAll5 <- tokens_select(toksCAll2, pattern = "([0-9]+)", selection="remove", valuetype = "regex", padding = TRUE)
         saveRDS(toksCAll5, "./data/processedData/toksCAll5.RDS")
                 rm(toksCAll4)
                 # head(toksCAll5, 3)

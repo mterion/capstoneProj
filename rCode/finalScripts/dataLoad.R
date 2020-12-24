@@ -233,31 +233,40 @@ cat(green("Data summary starting\n"))
 # Clean data
 #=======================
 
-  # Character removal
-        #indivCharRemovalRegEx <- "[>|<|=|~|#|([0-9]+-[0-9]+)|%]" # clean characters and not word. Words, punct, emojis are done later at the level of tokenization
-
+        # Remove twitter abbreviations before tokenization
+                # If not, the removal of punctuation during tokenization will hinder the detection of twitter abbrevations
+        twitterAbbrRegEx <-tolower("\\b(
+                CC|CX|CT|DM|HT|MT|PRT|RT|EM|EZine|FB|LI|SEO|SM|SMM|SMO|SN|SROI|UGC|YT|AB|ABT|AFAIK|AYFKMWTS|
+                B4|BFN|BGD|BH|BR|BTW|CD9|CHK|CUL8R|DAM|DD|DF|DP|DS|DYK|EM|EML|EMA|F2F|FTF|FB|FF|FFS|FM|FOTD|
+                FTW|FUBAR|FWIW|GMAFB|GTFOOH|GTS|HAGN|HAND|HOTD|HT|HTH|IC|ICYMI|IDK|IIRC|IMHO|IR|IWSN|JK|JSYK|JV|KK|
+                KYSO|LHH|LMAO|LMK|LO|LOL|MM|MIRL|MRJN|NBD|NCT|NFW|NJoy|NSFW|NTS|OH|OMFG|OOMF|ORLY|PLMK|PNP|QOTD|RE|
+                RLRT|RTFM|RTQ|SFW|SMDH|SMH|SNAFU|SO|SOB|SRS|STFU|STFW|TFTF|TFTT|TJ|TL|TLDR|TL;DR|TMB|TT|TY|TYIA|TYT|
+                TYVW|W/E|W/|W|WE|WTV|YGTR|YKWIM|YKYAT|YMMV|YOLO|YOYO|YW|ZOMG|
+                #BrandChat|#CMAD|#CMGR|#FB|#FF|#in|#LI|#LinkedInChat|#Mmchat|#Pinchat|#SMManners|#SMMeasure|#SMOchat|#SocialChat|#SocialMedia
+                )\\b")
+        
 # Df
         blogsDf <- blogsDf %>% 
                 rename(text = as.character.blogsLines.) %>%
                 mutate(text = as.character(text)) %>%
-                #mutate(text = stri_replace_all_regex(text, '\"', ' ')) %>% # use stringi because much faster than gsub   
-                #mutate(text = stri_replace_all_regex(text, indivCharRemovalRegEx , " ")) %>% #need to replace with one space, if not will make a word out of 2 word when removing the unwanted char
+                mutate(text = tolower(text)) %>%
+                mutate(text = stri_replace_all_regex(text, twitterAbbrRegEx , "")) %>% 
                 mutate(doc_id = "enBlogs") %>%
                 mutate(type = "blogs")
         
         newsDf <- newsDf %>% 
                 rename(text = as.character.newsLines.) %>%
-                mutate(text = as.character(text)) %>%         
-                #mutate(text = stri_replace_all_regex(text, '\"', ' ')) %>%
-                #mutate(text = stri_replace_all_regex(text, indivCharRemovalRegEx , " ")) %>% 
+                mutate(text = as.character(text)) %>%
+                mutate(text = tolower(text)) %>%
+                mutate(text = stri_replace_all_regex(text, twitterAbbrRegEx , "")) %>% 
                 mutate(doc_id = "enUSNews") %>%
                 mutate(type = "news")
         
         twitterDf <- twitterDf %>%
                 rename(text = as.character.twitterLines.) %>%
-                mutate(text = as.character(text)) %>%            
-                #mutate(text = stri_replace_all_regex(text, '\"', ' ')) %>%
-                #mutate(text = stri_replace_all_regex(text, indivCharRemovalRegEx , " ")) %>% 
+                mutate(text = as.character(text)) %>%
+                mutate(text = tolower(text)) %>%
+                mutate(text = stri_replace_all_regex(text, twitterAbbrRegEx , "")) %>% 
                 mutate(doc_id = "enTwitts") %>%
                 mutate(type = "twitts")
         

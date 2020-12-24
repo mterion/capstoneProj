@@ -33,6 +33,7 @@
         rm(pannelFeatPlotNGram1, pannelFeatPlotNGram2, pannelFeatPlotNGram3)
 
 # Create nGram tables : NO PUNCTUATION
+        toksCAll <- readRDS("./data/processedData/toksCAll.RDS")  
         toksCBlogs <- readRDS("./data/processedData/toksCBlogs.RDS")
         toksCNews <- readRDS("./data/processedData/toksCNews.RDS")
         toksCTwitts <- readRDS("./data/processedData/toksCTwitts.RDS")

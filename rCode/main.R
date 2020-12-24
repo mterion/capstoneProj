@@ -20,11 +20,14 @@
         library(ggplot2)
         library(plotly)
 
+# install.packages("devtools") # get devtools to install quanteda.corpora
+# devtools::install_github("texplot_network")
+
 #=======================
 # Corpus Creation
 #=======================
 
-# Clear and call libraries
+# and call libraries
         source("./rCode/finalScripts/clearStart.R")
 
 # Call function file

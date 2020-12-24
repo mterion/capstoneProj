@@ -63,12 +63,12 @@ readRDS("./figures/finalFigures/violinWordCount.RDS")
 Before conducting analysis and developping models, the data needed to be pre-processed. The sequence applied is the following:
 
 * Corpus creation: All documents from the three different sources were merged into a single corpus.
+* Removal of [twitter abbreviations](https://www.socialmediatoday.com/content/top-twitter-abbreviations-you-need-know) before tokenization.
 * Tokenization: All texts contained in the corpus were separated into smaller units called tokens which can be words, characters or subwords.
 * Token conversion: Token were converted to lower case
 * Token cleaning:
     + All Punctuation, symbols such as emoji, url, separators and isolated numbers were removed.
     + Urls removal: a second url filter was applied by considering 1504 [domain names](https://data.iana.org/TLD/tlds-alpha-by-domain.txt)
-    + All existing tokens were split on punctuations marks or symbols and the separators removed. (e.g. "2.2" would make two tokens of "2")
     + All tokens consisting of numbers were removed.
     + All profanity words were deleted. The profanity filter built used this [data source](https://raw.githubusercontent.com/shutterstock/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/master/en)
     + A personal dictionary was built to contain other unsignificant words needing to be discarded (e.g. "mg", "rd"...)
@@ -120,7 +120,6 @@ The characteristics of the languages from Twitts where the same words can be rep
 ```{r n1A}
         readRDS("./figures/finalFigures/nGram_1_TableAll.RDS")
 ``` 
-
 
 ##### n1B
 ```{r n1B}
@@ -178,8 +177,34 @@ The characteristics of the languages from Twitts where the same words can be rep
 ``` 
 
 
+#### Semantic network analys {.tabset}
+Semantic relations between words (n-grams1) are displayed underneath. A feature co-occurence matrix was constructed in order to analyze the patterns of the 50 most frequent words from each source. The intensity of the relations between words shows interesting patterns. 
+
+Twitts, beside highlighting a specific abbreviated type of language, show stronger co-occurence of words related to emotions (great, time, thanks, happy...) and a time frame limited to activities carried out now (day, morning, weekend, time, today...). On the other end of the spectrum, and not surprisingly, news are detached from emotions:  Co-occurences of words are factual and the time frame window is much larger. Finally, blogs appear to in a category between those two extremes, having more factual content than twitts but still being emotionally related.
+
+##### sNetwAll
+```{r sNetwAll}
+        readRDS("./figures/finalFigures/semNetwCAll.RDS")
+``` 
+
+##### sNetwBlogs
+```{r sNetBlogs}
+        readRDS("./figures/finalFigures/semNetwCBlogs.RDS")
+```
+
+##### sNetwNews
+```{r sNetwNews}
+        readRDS("./figures/finalFigures/semNetwCNews.RDS")
+```
+
+##### sNetwTwitts
+```{r sNetwTwitts}
+        readRDS("./figures/finalFigures/semNetwCTwitts.RDS")
+``` 
+
+
 #### n-grams tables with stop words {.tabset}
-To understand the particularities of the content of the different sources, stop words (e.g. a, and, but, how, etc.) were removed in the previous tables. Neverthelesse, a predictive model that will help the user predict the next word when using his mobile device requires to integrate stop words in the model prediction. Therefore, the next table provide an overview of the integrated dataset, with the inclusion of stop words.
+To understand the particularities of the content of the different sources, stop words (e.g. a, and, but, how, etc.) were removed in the previous tables and analyses. Nevertheless, a predictive model that should help the user predict the next word when using his mobile device, requires to integrate stop words in model prediction. Therefore, the next table provide an overview of the integrated dataset, with the inclusion of stop words.
 
 
 ##### n1ASW
@@ -254,6 +279,7 @@ Smoothing will allow to flatten spiky distribution to get a better generalizatio
 ## 4. Appendix
 ### 4.1 Details of data and process
 ### 4.2 References
+[twitter abbreviations](https://www.socialmediatoday.com/content/top-twitter-abbreviations-you-need-know)
 [Profanity list](https://data.iana.org/TLD/tlds-alpha-by-domain.txt)
 [Data source](https://raw.githubusercontent.com/shutterstock/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/master/en)
 [N-gram language models](https://web.stanford.edu/~jurafsky/slp3/3.pdf)

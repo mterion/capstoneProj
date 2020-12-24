@@ -1,3 +1,16 @@
+# Color to be used in the whole document
+        # All
+                rgbChartreuse2 <<- "rgb(118,238,0)"
+        # Blogs
+                rgbSteelblue <<- "rgb(70,130,180)"
+                
+        # News
+                rgbSalmon <<- "rgb(250,128,114)"
+        # Twitts
+                rgbSeagreen <<- "rgb(46,139,87)"
+
+
+
 # Feature plot function for DFM dataDFM and dataNGram
 
         ######
@@ -40,6 +53,60 @@
                       return(featPlot)
         }
 
+#Semantic Network
+        ###
+        #cName = "CBlogs"; toksCType = "toksCBlogs"; minTermFreq = 1000; topFeaturesNr = 50
+        # cName <- cNews        
+        # toksCType <- "toksCNews"
+        # minTermFreq <- 1000
+        # topFeaturesNr <- 50
+        ###
+                
+        semanticNetwFun <- function(cName, toksCType, minTermFreq, topFeaturesNr){
+                # Load
+                toksCType <- readRDS(paste0("./data/processedData/", toksCType, ".RDS"))
+                
+                # Remove empty token to avoid cluttering document feature matrix with unusable frequencies
+                toksCType <- tokens_select(toksCType, "", selection="remove", valuetype = "fixed", padding=FALSE)
+                
+                # Document feature matrix creation
+                toksDfm <- dfm(toksCType)
+                
+                # Trim
+                toksDfmTrim <- dfm_trim(toksDfm, min_termfreq = minTermFreq)
+                        dim(toksDfmTrim)
+                        
+                # Feature co-occurence matrix (FCM)
+                toksFcm <- fcm(toksDfmTrim)
+                        dim(toksFcm) 
+                        
+                # Top features
+                topFeatures <- names(topfeatures(toksFcm, topFeaturesNr))
+                        head(topFeatures)
+                
+                # Filter the 50 top features from the FCM
+                toksFcmFilt <- fcm_select(toksFcm, pattern = topFeatures, selection = "keep")
+                        dim(toksFcmFilt)
+                        
+                # Plot semantic network
+                set.seed(144)
+                semNetw <- textplot_network(
+                        toksFcmFilt,
+                        min_freq = 0.5,
+                        omit_isolated = TRUE,
+                        edge_color = "lightgrey",
+                        edge_alpha = 1,
+                        edge_size = 0.8,
+                        vertex_color = "steelblue",
+                        vertex_size = 2,
+                        vertex_labelcolor = NULL,
+                        vertex_labelfont = NULL,
+                        vertex_labelsize = 5)
+                saveRDS(semNetw, paste0("./figures/finalFigures/semNetw", cName,".RDS"))
+                return(semNetw)
+        }
+                
+    
 # Integrated pannel plot for n-gram : 4 plots (integrated dataset, blogs, news, twitts)
                 ###
                         # nGram <- 3
@@ -199,7 +266,7 @@
                 # Plotly tables
                         # All
                         cat(green("     Creation of n-grams table: All\n"))
-                        rgbChartreuse2 <- "rgb(118,238,0)"
+#                       rgbChartreuse2 <- "rgb(118,238,0)"
                         nGramTableAll <- nGramIndivTableFun(dfmToksNGramXAll, typeDoc = "Integrated Dataset", colorHeader = rgbChartreuse2)
                         print(nGramTableAll)
                         cat(green("     Saving of n-grams table: All\n"))
@@ -208,7 +275,7 @@
                         
                         # Blogs
                         cat(green("     Creation of n-grams table: Blogs\n"))
-                        rgbSteelblue <- "rgb(70,130,180)"
+#                       rgbSteelblue <- "rgb(70,130,180)"
                         nGramTableBlogs <- nGramIndivTableFun(dfmToksNGramXBlogs, typeDoc = "Blogs", colorHeader = rgbSteelblue)
                         print(nGramTableBlogs)
                         cat(green("     Saving of n-grams table: Blogs\n"))
@@ -217,7 +284,7 @@
                         
                         # News
                         cat(green("     Creation of n-grams table: News\n"))
-                        rgbSalmon <- "rgb(250,128,114)"
+#                       rgbSalmon <- "rgb(250,128,114)"
                         nGramTableNews <- nGramIndivTableFun(dfmToksNGramXNews, typeDoc = "News", colorHeader = rgbSalmon)
                         print(nGramTableNews)
                         cat(green("     Saving of n-grams table: News\n"))
@@ -226,7 +293,7 @@
                         
                         # Twitts
                         cat(green("     Creation of n-grams table: Twitts\n"))
-                        rgbSeagreen <- "rgb(46,139,87)"
+#                       rgbSeagreen <- "rgb(46,139,87)"
                         nGramTableTwitts <- nGramIndivTableFun(dfmToksNGramXTwitts, typeDoc = "Twitts", colorHeader = rgbSeagreen)
                         print(nGramTableTwitts)
                         cat(green("     Saving of n-grams Twitts: All\n"))
