@@ -55,12 +55,19 @@
         toksCNews <- readRDS("./data/processedData/toksCNews.RDS")
         toksCTwitts <- readRDS("./data/processedData/toksCTwitts.RDS")
 
-# NGrams operations
+#=======================
+# Exploratory analysis
+#=======================
+# NGrams operations / ngraph, Graphs
         source("./rCode/finalScripts/dataNGram.R")
         
+# Semantic networks
+        source("./rCode/finalScripts/semanticNetwork.R")
 
-# Document-feature matrix and feature co-occurence matrix
-        #source("./rCode/rawCode/dfm_fcm.R")
+#=======================
+# Models
+#=======================        
+# Data partition for models        
 
         
         

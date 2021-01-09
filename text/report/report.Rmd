@@ -1,7 +1,7 @@
 ---
 title: "Natural Language Processing"
 author: "Manu"
-date: "14/12/2020"
+date: "26/12/2020"
 output:
   html_document:
     toc: true
@@ -20,14 +20,15 @@ knitr::opts_knit$set(root.dir = "C:/Users/cliva/OneDrive - Analytic Base/persona
 The objective of the present work is to develop a smart keyboard to enable people to be more effective on their mobile devices. A predictive text model has been developed, giving the user of mobile device three options for what the next word might be.
 
 ### 1.2 Context
-To develop such a model, a large corpus of text documents was created by merging three different types of english sources: blogs, news and twitts. The raw data, [*The Capstone Data Set*](https://www.coursera.org/lecture/data-science-project/welcome-to-the-capstone-project-uUGxK), was provided by John Hopkins University and the whole code used for creating this report and the predictive model is available on [*Github*](https://github.com/mterion/capstoneProj).
+To develop such a model, a large corpus of text documents was created by merging three different types of english sources: blogs, news and twitts. The raw data, [The Capstone Data Set](https://www.coursera.org/lecture/data-science-project/welcome-to-the-capstone-project-uUGxK), was provided by John Hopkins University and the whole code used for creating this report and the predictive model is available on [Github](https://github.com/mterion/capstoneProj).
 
 ### 1.3 Summary
 #### 1.3.1 Research question
 The research question addressed is : "How can an efficient text predicitve model be developed for users of mobile devices on the base of publicly available data such as blogs, news wires and tweets ?". This implies that the methodology developed in this work can be replicated for any language, if needed.
-
+<!-- 
 #### 1.3.2 Conclusion
 #### 1.3.3 Outline of the report
+-->
 
 ## 2. Sections
 ### 2.1 Data
@@ -231,46 +232,106 @@ coverage0.9 <- format(readRDS("./figures/finalFigures/coverage0.9.RDS"), big.mar
 ```
 The number of unique words in the corpus is `r nrWordC`. The amount of unique words (including stop words) needed to cover a percentage of all word instances mentioned in this corpus can be seen in the following table. It requires for example `r coverage0.5` unique words to cover 50% of all word instances and `r coverage0.9` unique words to cover 90% of all word instances present in all documents studied.
 
-```{r coverageTable}
+```{r coverageTable, fig.height=1.2}
 rm(nrWordC, coverage0.5, coverage0.9)
 readRDS("./figures/finalFigures/coverageTable.RDS")
 ```
 
+### 2.3.2 Models{.tabset}
+
+#### Summary 
+A statistical language model is a distribution of probabilities over a sequence of word: $P(w_{1},\ w_{2},\ ...,\ w_{m})$.^[https://en.wikipedia.org/wiki/Language_model] 
+In such a language, n-gram are made by considering sequences of words. For example a ngram2 or bigram has the sequence $(w_{i-1},\ w_{i})$ and an ngram3 or trigram the sequence: $(w_{i-2},\ w_{i-1},\ w_{i})$.
+
+#### SBO
+A simple model is the SBO which does not generate probabilities or apply discount, but use relative frequencies interpreted as a score "S". A SBO model is relatively inexpensive to train and works well on large corpora^[https://www.aclweb.org/anthology/D07-1090.pdf] 
+
+The model start with ngram3 and backoff to ngram2 and finally ngram1 if no search hits are returned. If there are hits within ngrams, the word with the highest frequency is returned. For example, if the user input is "I want to go" : 
+
+* A search is first conducted in the ngram3 $(w_{i-2},\ w_{i-1},\ w_{i})$. The following ngram3 could have been, for example, observed: "to_go_home", "to_go_swimming", "...". 
+
+* If none are observed, it will back-off to a search in the ngram2 $(w_{i-1},\ w_{i})$. The following ngram2 could have been observed: "go_far", "go_west", "...".
+
+* If none are observed, then the final search is conducted in the ngram1 $(w_{i})$. The following ngram1 could have been observed: "you", "with", "...".
+
+It should be noted that the ngram2 and ngram1 procedures have a backoff factor alpha that is applied to the selected frequencies. Please refer to the equations underneath for more details.
+
+
+##### SBO estimate
+The SBO estimate are the following:
+
+* **ngram3**:
+$S_{SBO}(w_{i}|w_{i-2}, w_{i-1})\ =$
+    + if ${C(w_{i-2},\ w_{i-1},\ w_{i}) >0 }$ then $\frac{C(w_{i-2},\ w_{i-1},\ w_{i})}{C(w_{i-2},\ w_{i-1})}$
+    + else $\alpha\ * S_{SBO}(w_{i}|w_{i-1})$ which is the following algorithm for ngram2  
+<p>&nbsp;</p>
+
+* **ngram2**:
+$S_{SBO}(w_{i}|w_{i-1})\ =$
+     + if $C(w_{i-1},\ w_{i}) > 0$ then $\frac{C(w_{i-1}, w_{i})}{C(w_{i-1})}$
+     + else $\alpha\ * \frac {C(w_{i})}{\sum_{j=1}^{m}C(w_{j})}$ which is simply the ML of ngram1
+
+The backoff factor $\alpha$ with a value of 0.4 was used based on experiments made by the authors of this model.
+
+
+#### KBO
+##### Probabilities estimation
+The Katz's back-off model consider the conditional probability of a word given the immediate n-gram preceding sequence.^[https://en.wikipedia.org/wiki/Katz's_back-off_model#cite_note-2] The strategy is to use higher order n-gram model if enough data is available and to back off to lower order n-gram when data is missing. Given the fact that many words may not appear in the training data, discounting need to be used to avoid zero probabilities issues.^[Manning & Schütze, 1999, Foundation of statistical natural language processing, MIT, p.255]
+
+Discounting methods allow to somewhat decrease the probability of seen events, in order to obtain some probability mass that can be assigned to unseen events. The process of discounting is referred as smoothing, due to the removal of zeroes. ^[Ibid, p.252]
+
+Due to the size of the corpus, the computing time of the algorithm needed to be considered. Therefore, if a search in ngram3 was successful and amounted to more than 5 occurrences ($k>5$) of the same ngram3, the conditional probability of a word given its history is proportional to its maximum likelihood estimate: 
+
+$EstP(w_{i}|w_{i-2},\ w_{i-1}) =$
+
+* if $C(w_{i-2},\ w_{i-1},\ w_{i}) > 5$ 
+    + then $P_{ML}(w_{i}|w_{i-1}, w_{i-2}) = \frac{C( w_{i-2},\ w_{i-1},\ w_{i})}{C(w_{i-1},\ w_{i})}$
+
+Otherwise, the KBO model is applied.
+
+$Pbo(w_{i}|w_{i\ n+1},\ _{\dots}\ , w_{i}) =$
+
+* if $C(w_{i-n+1},\ _{\dots}\ , w_{i}) > 0$ 
+    + then $d_{w_{i-n+1,\ ...,\ w_{i}}} \ \frac{C(w_{i-n+1},\ _{\dots}\ ,\ w_{i-1},\ w_{i})}{C(w_{i-n+1},\ _{\dots}\ ,\ w_{i-1}}$
+* else $\alpha_{wi-n+1,\ ...,\ w_{i-1}} Pbo(w_{i}|w_{i-n+2},\ _{\dots}\ ,w_{i-1})$
+
+
+Where $d$ is the amount of discount applied with the typical value of 0.5 chosen.^[http://www.cs.columbia.edu/~mcollins/lm-spring2013.pdf] The definitions of the discounted counts for both ngrams are: 
+
+* For ngram2: $c^*(w_{i-1},\ w_{i})=c(w_{i-1},\ w_{i}) - d$
+* For ngram3: $c^*(w_{i-2},\ w_{i-1},\ w_{i})=c(w_{i-2},\ w_{i-1},\ w_{i}) - d$
+
+The backed off probabilities after discount for observed ngrams are then:
+
+* For ngram2: $\frac{c^*(w_{i-1},\ w_{i})}{c(w_{i-1})}$
+* For ngram3: $\frac{c^*(w_{i-2},\ w_{i-1},\ w_{i})}{c(w_{i-2},\ w_{i-1})}$
+
+This leads to $\alpha$ which is the missing probability mass taken from observed ngrams defined as:
+
+* For ngram2: $\alpha(w_{i-1}) = 1-\sum_{w\in A_{(w_{i-1})}} \frac{c^*(w_{i-1},\ w_{i})}{c(w_{i})}$
+* For ngram3: $\alpha(w_{i-2},\ w_{i-1}) = 1-\sum_{w\in A_{(w_{i-2},\ w_{i-1})}} \frac{c^*(w_{i-2},\ w_{i-1},\ w_{i})}{c(w_{i-1},\ w_{i})}$
+    + Where $A$ means all the words terminating an ngram.^[http://www.cs.columbia.edu/~mcollins/lm-spring2013.pdf]
+
+Finally, the missing probability mass is assigned to unobserved ngram :
+
+* For ngram2: $\alpha(w_{i-1}) = \frac{q_{ML}(w_{i})}{\sum_{w\in B_{(w_{i-1})}} q_{ML}(w)}$ 
+* For ngram3: $\alpha(w_{i-2},\ w_{i-1}) = \frac{q_{BO}(w_{i}|w_{i-1})}{\sum_{w\in B_{(w_{i-2},\ w_{i-1})}} q_{BO}(w|w_{i-1})}$
+    + Where $B$ means all the remaining words in the vocabulary.
+
+In the very unlikely case that both words constituting the last words of the user input are both unknown in the whole vocabulary of the Corpus, the $P_{ML}$ of ngram1 are returned.
+
+
 ### 2.4 Results
+
+
+
+
 The different tasks (1-2) answers are the following:
 
-1. **How do you evaluate how many of the words come from foreign languages?** 
-This can be done by using a foreign language dictionary and filtering out the words that belongs to it. It goes in the same direction than the work done with the removal of profanity words on the base of a special dictionary.
-
-2. **Can you think of a way to increase the coverage -- identifying words that may not be in the corpora or using a smaller number of words in the dictionary to cover the same number of phrases?**
-     i) Using a smaller number of words in the dictionary to cover the same number of phrase can simply be done by removing the dictionary low-frequency words. It can also be done by reducing the number of low frequency words by stemming.
-     i) Increasing the coverage can be done by comparing the corpus dictionary with a full language dictionary, taking the delta and thinking about why this words were not in our original corpus. This will give indication at whether we should include other types of data sources (blogs of different types, etc.) in our actual corpus.
-     
-     
-3. **How can you efficiently store an n-gram model (think Markov Chains)?** The main idea is to be able to produce the probability of a word w given som history h. The intuition with n-gram model is to approximate the probability of a word not given its entire history bt to approximate its history by just the last few words. It sticks with the Markov model assumption.The efficient storage of a markov chain model is that it stores the probability in a sequence of events based on the state attained in the previous event. Thus the clear advantage is to promote efficiency in the storage of the model. It suits perfectly for sequence processing as done in natural language processing.
-     
-4. **How can you use the knowledge about word frequencies to make your model smaller and more efficient?** By concentrating on the most frequent words first for model prediction, leaving outliers aside.
-
-5. **How many parameters do you need (i.e. how big is n in your n-gram model)?** Bigram will be the start, altough that in the field it's more common to use trigram models that condition on the previous two words or 4-grams that condition on previous three words. As we increase the value of N, the accuracy of the n-gram model increases because the choice of the next word becomes increasingly constrained. 
-
-6. **Can you think of a simple way to smooth the probabilities (think about giving all n-grams a non-zero probability even if they aren't observed in the data) ?** The mains problem are the following:
-    i) A small number of words occur very frequently and that a large number are seen only once. They are said to follow a Zipfian distribution.
-    i)  Zero probabilities on one bigram will cause a zero probability on the entire sequence
-    i) The likelihood of unseen n-grams need to be estimated as well
-
-Smoothing will allow to flatten spiky distribution to get a better generalization. The main different forms of smoothing are :
-    i)	**Laplace smoothing**: Add 1 to every word count
-    i)	**Good-Turing Discounting** : Re-estimate amount of probability mass for zero or low count ngrams by looking at ngram with hither counts
-    i)	**Backoff Methods (Kazt)** : Compute unigram, bigram and trigram probability. Start with trigram, if not available back of to bigram and finally unigram if necessary.
-
-
-7. **How do you evaluate whether your model is any good?** By developping the model on a training data set (75% of original data) and testing it on a test data set (25% of original data)
-
-8. **How can you use backoff models to estimate the probability of unobserved n-grams?**
 
  
 
-
+<!--
 ## 3. Conclusion
 ### 3.1 Research question addressed
 ### 3.2 Results obtained
@@ -279,12 +340,15 @@ Smoothing will allow to flatten spiky distribution to get a better generalizatio
 ## 4. Appendix
 ### 4.1 Details of data and process
 ### 4.2 References
-[twitter abbreviations](https://www.socialmediatoday.com/content/top-twitter-abbreviations-you-need-know)
+[Twitter abbreviations](https://www.socialmediatoday.com/content/top-twitter-abbreviations-you-need-know)
+
 [Profanity list](https://data.iana.org/TLD/tlds-alpha-by-domain.txt)
+
 [Data source](https://raw.githubusercontent.com/shutterstock/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/master/en)
+
 [N-gram language models](https://web.stanford.edu/~jurafsky/slp3/3.pdf)
 
-
+-->
 
 
 

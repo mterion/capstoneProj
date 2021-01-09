@@ -252,7 +252,9 @@ cat(green("Data summary starting\n"))
                 mutate(text = tolower(text)) %>%
                 mutate(text = stri_replace_all_regex(text, twitterAbbrRegEx , "")) %>% 
                 mutate(doc_id = "enBlogs") %>%
-                mutate(type = "blogs")
+                mutate(type = "blogs") %>%
+                mutate(typeIdNr = row_number()) %>%
+                mutate(set = if_else(typeIdNr < round(nrow(blogsDf) * 0.8), "train", "test"))
         
         newsDf <- newsDf %>% 
                 rename(text = as.character.newsLines.) %>%
@@ -260,7 +262,9 @@ cat(green("Data summary starting\n"))
                 mutate(text = tolower(text)) %>%
                 mutate(text = stri_replace_all_regex(text, twitterAbbrRegEx , "")) %>% 
                 mutate(doc_id = "enUSNews") %>%
-                mutate(type = "news")
+                mutate(type = "news")%>%
+                mutate(typeIdNr = row_number()) %>%
+                mutate(set = if_else(typeIdNr < round(nrow(newsDf) * 0.8), "train", "test"))
         
         twitterDf <- twitterDf %>%
                 rename(text = as.character.twitterLines.) %>%
@@ -268,7 +272,9 @@ cat(green("Data summary starting\n"))
                 mutate(text = tolower(text)) %>%
                 mutate(text = stri_replace_all_regex(text, twitterAbbrRegEx , "")) %>% 
                 mutate(doc_id = "enTwitts") %>%
-                mutate(type = "twitts")
+                mutate(type = "twitts")%>%
+                mutate(typeIdNr = row_number()) %>%
+                mutate(set = if_else(typeIdNr < round(nrow(twitterDf) * 0.8), "train", "test"))
         
 cat(green("Data frames created and cleaned\n"))        
         
