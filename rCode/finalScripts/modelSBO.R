@@ -1,53 +1,46 @@
-
-#=========================================
-# Intro
-#=========================================
-
-        rm(list = ls())
-        library(quanteda)
-        library(dplyr)
-        library(stringi)
-        library(stringr)
-        library(crayon) # for cat colors green
-        
-        source("./rcode/functionSBO.R")
-        
-#=========================================
-# Corpus creation
-#=========================================
-
-        ltcorpus <- readLines("./data/testCorpus1.txt")
-        ltcorpus
-        toks <- tokens(ltcorpus, remove_punct = TRUE)
-        toks <- tokens_tolower(toks)
-    
-#=========================================
-# Function to create ngram frequency tables from the corpus
-#=========================================
-        
-    ngramFreqDfFun <- function(tokensOfTheCorpus, ngramValue){
-        tokNgram <- tokens_ngrams(tokensOfTheCorpus, ngramValue)
-        ngramDfm <- dfm(tokNgram)
-        featNames <- featnames(ngramDfm)
-        freq <- colSums(ngramDfm)
-        ngramFreqDf <- data.frame(featNames, freq)
-                rm(ngramDfm, featNames, freq)
-                rownames(ngramFreqDf) <- c() # Remove row names and replace them with ID nr   
-        
-        return(ngramFreqDf)
-        }
-
-    ngram1FreqDf <- ngramFreqDfFun(toks, 1)
-    ngram2FreqDf <- ngramFreqDfFun(toks, 2)
-    ngram3FreqDf <- ngramFreqDfFun(toks, 3)
-          ngram1FreqDf; ngram2FreqDf; ngram3FreqDf
+# 
+# #=========================================
+# # Intro
+# #=========================================
+# 
+#         rm(list = ls())
+#         library(quanteda)
+#         library(dplyr)
+#         library(stringi)
+#         library(stringr)
+#         library(crayon) # for cat colors green
+#         
+#         source("./rcode/functionSBO.R")
+#         
+# #=========================================
+# # Corpus creation
+# #=========================================
+# 
+#         ltcorpus <- readLines("./data/testCorpus1.txt")
+#         ltcorpus
+#         toks <- tokens(ltcorpus, remove_punct = TRUE)
+#         toks <- tokens_tolower(toks)
+#     
+# #=========================================
+# # Function to create ngram frequency tables from the corpus
+# #=========================================
+#     
+#     ngram1FreqDf <- ngramFreqDfFun(toks, 1)
+#     ngram2FreqDf <- ngramFreqDfFun(toks, 2)
+#     ngram3FreqDf <- ngramFreqDfFun(toks, 3)
+#           ngram1FreqDf; ngram2FreqDf; ngram3FreqDf
+# 
 
 
-#=========================================
-    # Main function    
-#=========================================
-          # userInput_ <- "I want to buy the"
-          # backOffFactorAlpha_ = 0.4
+
+
+
+ 
+# #=========================================
+#     # Main function    
+# #=========================================
+#           # userInput_ <- "I want to buy the"
+#           # backOffFactorAlpha_ = 0.4
 
 getBestSBODf <- function(userInput_, backOffFactorAlpha_ = 0.4){
   
@@ -89,7 +82,8 @@ getBestSBODf <- function(userInput_, backOffFactorAlpha_ = 0.4){
                                 ngram3FreqScoresDf <- getNGram3FreqScoresDf(ngram2HitFreq, ngram3HitFreqDf)
                                 
                                 # get df wi and the scores in descending order
-                                wiScoresDfNgram3 <- getWiScoresDfngram3(ngram3FreqScoresDf)
+                                wiScoresDfNgram3 <- getWiScoresDfngram3(ngram3FreqScoresDf) %>% 
+                                slice_head(n = 10)
                         
                                 cat(green("ngram3 best score df:\n"))
                                 return(wiScoresDfNgram3)
@@ -107,7 +101,8 @@ getBestSBODf <- function(userInput_, backOffFactorAlpha_ = 0.4){
                         ngram2FreqScoresDf <- getNGram2FreqScoresDf(ngram1HitFreq, ngram2HitFreqDf, backOffFactorAlpha)
                         
                         # get df wi and the scores in descending order
-                        wiScoresDfNgram2 <- getWiScoresDfngram2(ngram2FreqScoresDf)
+                        wiScoresDfNgram2 <- getWiScoresDfngram2(ngram2FreqScoresDf)%>% 
+                        slice_head(n = 10)
                         wiScoresDfNgram2
                         
                         cat(green("ngram2 best score df:\n"))
@@ -116,7 +111,8 @@ getBestSBODf <- function(userInput_, backOffFactorAlpha_ = 0.4){
                   
                 } else {
                         cat(green("ngram1 best score df:\n"))
-                        ngram1HitFreqDf <- getNgram1HitFreqtDf(ngram1FreqDf, backOffFactorAlpha)
+                        ngram1HitFreqDf <- getNgram1HitFreqtDf(ngram1FreqDf, backOffFactorAlpha)%>% 
+                        slice_head(n = 10)
                         return(ngram1HitFreqDf)
                 }
         }
@@ -124,7 +120,7 @@ getBestSBODf <- function(userInput_, backOffFactorAlpha_ = 0.4){
 
     
         
-getBestSBODf("I want to sell")
+# getBestSBODf("I want to sell")
     
 #=========================================    
 #=========================================

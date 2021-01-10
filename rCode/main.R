@@ -14,24 +14,26 @@
         library(spacyr)
         library(newsmap)
         library(stringi)
+        library(stringr)
         library(dplyr)
         library(crayon) # for cat colors green
         library(newsmap) # for geographical dict
         library(ggplot2)
         library(plotly)
 
-# install.packages("devtools") # get devtools to install quanteda.corpora
-# devtools::install_github("texplot_network")
-
 #=======================
 # Corpus Creation
 #=======================
 
-# and call libraries
+# Clear and call libraries
         source("./rCode/finalScripts/clearStart.R")
 
 # Call function file
         source("./rCode/finalScripts/functions.R")
+        source("./rCode/finalScripts/functionSBO.R")
+        source("./rCode/finalScripts/functionKBO.R")
+        source("./rCode/finalScripts/modelSBO.R")
+        source("./rCode/finalScripts/modelKBO.R")
 
 # Load data, summary and corpus creation
         source("./rCode/finalScripts/dataLoad.R")
@@ -45,29 +47,17 @@
         source("./rCode/finalScripts/dataTokens.R")
 
         # Save / read
-        saveRDS(toksCAll, "./data/processedData/toksCAll.RDS")
-        saveRDS(toksCBlogs, "./data/processedData/toksCBlogs.RDS")
-        saveRDS(toksCNews, "./data/processedData/toksCNews.RDS")
-        saveRDS(toksCTwitts, "./data/processedData/toksCTwitts.RDS")
-        
         toksCAll <- readRDS("./data/processedData/toksCAll.RDS")
         toksCBlogs <- readRDS("./data/processedData/toksCBlogs.RDS")
         toksCNews <- readRDS("./data/processedData/toksCNews.RDS")
         toksCTwitts <- readRDS("./data/processedData/toksCTwitts.RDS")
 
-#=======================
-# Exploratory analysis
-#=======================
-# NGrams operations / ngraph, Graphs
+# NGrams operations
         source("./rCode/finalScripts/dataNGram.R")
         
-# Semantic networks
-        source("./rCode/finalScripts/semanticNetwork.R")
 
-#=======================
-# Models
-#=======================        
-# Data partition for models        
+# Document-feature matrix and feature co-occurence matrix
+        #source("./rCode/rawCode/dfm_fcm.R")
 
         
         

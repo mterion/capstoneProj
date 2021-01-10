@@ -245,7 +245,7 @@ cat(green("Data summary starting\n"))
                 #BrandChat|#CMAD|#CMGR|#FB|#FF|#in|#LI|#LinkedInChat|#Mmchat|#Pinchat|#SMManners|#SMMeasure|#SMOchat|#SocialChat|#SocialMedia
                 )\\b")
         
-# Df
+# Df with train-valid-test partition
         blogsDf <- blogsDf %>% 
                 rename(text = as.character.blogsLines.) %>%
                 mutate(text = as.character(text)) %>%
@@ -254,7 +254,13 @@ cat(green("Data summary starting\n"))
                 mutate(doc_id = "enBlogs") %>%
                 mutate(type = "blogs") %>%
                 mutate(typeIdNr = row_number()) %>%
-                mutate(set = if_else(typeIdNr < round(nrow(blogsDf) * 0.8), "train", "test"))
+                mutate(trainTestSet = case_when(
+                        typeIdNr < round(nrow(blogsDf) * 0.8) ~ "train",
+                        TRUE ~ "test")) %>% # equivalent to else
+                mutate(trainValidTestSet = case_when(
+                        typeIdNr < round(length(which(trainTestSet == "train")) * 0.8) ~ "train",
+                        typeIdNr >= round(length(which(trainTestSet == "train")) * 0.8) & trainTestSet == "train" ~ "valid",
+                        TRUE ~ "test"))
         
         newsDf <- newsDf %>% 
                 rename(text = as.character.newsLines.) %>%
@@ -264,7 +270,13 @@ cat(green("Data summary starting\n"))
                 mutate(doc_id = "enUSNews") %>%
                 mutate(type = "news")%>%
                 mutate(typeIdNr = row_number()) %>%
-                mutate(set = if_else(typeIdNr < round(nrow(newsDf) * 0.8), "train", "test"))
+                mutate(trainTestSet = case_when(
+                        typeIdNr < round(nrow(newsDf) * 0.8) ~ "train",
+                        TRUE ~ "test")) %>% # equivalent to else
+                mutate(trainValidTestSet = case_when(
+                        typeIdNr < round(length(which(trainTestSet == "train")) * 0.8) ~ "train",
+                        typeIdNr >= round(length(which(trainTestSet == "train")) * 0.8) & trainTestSet == "train" ~ "valid",
+                        TRUE ~ "test"))
         
         twitterDf <- twitterDf %>%
                 rename(text = as.character.twitterLines.) %>%
@@ -274,7 +286,13 @@ cat(green("Data summary starting\n"))
                 mutate(doc_id = "enTwitts") %>%
                 mutate(type = "twitts")%>%
                 mutate(typeIdNr = row_number()) %>%
-                mutate(set = if_else(typeIdNr < round(nrow(twitterDf) * 0.8), "train", "test"))
+                mutate(trainTestSet = case_when(
+                        typeIdNr < round(nrow(twitterDf) * 0.8) ~ "train",
+                        TRUE ~ "test")) %>% # equivalent to else
+                mutate(trainValidTestSet = case_when(
+                        typeIdNr < round(length(which(trainTestSet == "train")) * 0.8) ~ "train",
+                        typeIdNr >= round(length(which(trainTestSet == "train")) * 0.8) & trainTestSet == "train" ~ "valid",
+                        TRUE ~ "test"))
         
 cat(green("Data frames created and cleaned\n"))        
         
@@ -332,9 +350,16 @@ cat(green("Individual corpuses merged into one large corpus 'cAll'\n"))
                 # I will use subset() to work on them individually
 
 
-
-
-        
+# Check train/valid/test sets
+        # trainCAll <- length(which(cAll$trainTestSet == "train"))
+        # testCAll <- length(which(cAll$trainTestSet == "test"))
+        # trainCAll + testCAll == ndoc(cAll)
+        #        
+        # trainCAll <- length(which(cAll$trainValidTestSet == "train"))
+        # validCAll <- length(which(cAll$trainValidTestSet == "valid"))
+        # testCAll <- length(which(cAll$trainValidTestSet == "test"))
+        # trainCAll + + validCAll + testCAll == ndoc(cAll)
+        # 
         
    
         

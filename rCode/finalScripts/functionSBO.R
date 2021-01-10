@@ -1,3 +1,18 @@
+# ngram creation with ngram FreqDf
+
+    ngramFreqDfFun <- function(tokensOfTheCorpus, ngramValue){
+        tokNgram <- tokens_ngrams(tokensOfTheCorpus, ngramValue)
+        ngramDfm <- dfm(tokNgram)
+        featNames <- featnames(ngramDfm)
+        freq <- colSums(ngramDfm)
+        ngramFreqDf <- data.frame(featNames, freq)
+                rm(ngramDfm, featNames, freq)
+                rownames(ngramFreqDf) <- c() # Remove row names and replace them with ID nr   
+        
+        return(ngramFreqDf)
+        }
+
+
 #=============================
 ## Ngram3
 #=============================

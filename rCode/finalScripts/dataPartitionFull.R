@@ -1,30 +1,52 @@
-        blogsDf <- readRDS("./data/processedData/blogsDf.RDS")
+        toksCAllSW <- readRDS("./data/processedData/toksCAllSW.RDS")                                            
         
+        # Remove empty tokens
+        
+                head(docvars(toksCAllSW))
 
-        
-        blogsDf1 <- blogsDf %>% 
-                rename(text = as.character.blogsLines.) %>%
-                mutate(text = as.character(text)) %>%
-                mutate(doc_id = "enBlogs") %>%
-                mutate(type = "blogs") %>%
-                mutate(typeIdNr = row_number()) %>%
-                mutate(trainTestSet = if_else(typeIdNr < round(nrow(blogsDf) * 0.8), "train", "test")) %>%
-                mutate(trainValidTestSet = if_else(typeIdNr < round(length(which(trainTestSet == "train")) * 0.8), "train", "valid")) %>%
-                mutate(trainValidTestSet = if(trainTestSet == "test"), "test")
-   
-# do the same with case_when             
-   https://datasciencelessons.wordpress.com/2019/11/22/tired-of-nested-ifelse-in-dplyr/
+# Partition train / test set
+        # TTS mean that partition is done on the trainTestSet col
+                # later, the partition will be done on the trainValidTestSet col (TVT) when using DL model
 
-           
-                   
-        nrowTrain <- length(which(blogsDf1$trainValidTestSet == "train"))
-        nrowValid <- length(which(blogsDf1$trainValidTestSet == "valid"))
-        nrowTest <- length(which(blogsDf1$trainValidTestSet == "test"))
-        
-        nrowTrain + nrowValid + nrowTest
-        
-        
-        round(length(which(blogsDf1$set == "train")) * 0.8)
+        toksCAllTrainTTS <- tokens_subset(toksCAllSW, trainTestSet == "train")
 
+        toksCAllTestTTS <- tokens_subset(toksCAllSW, trainTestSet == "test")
+                # test
+                ndoc(toksCAllTrainTTS) + ndoc(toksCAllTestTTS) == ndoc(toksCAllSW)
+
+
+# Train set
+        # Random sample of 10000
+        size_ <- 10000
+        trainSample <- tokens_sample(toksCAllTrainTTSRm, size_)
+        head(trainSample); tail(trainSample)
+        
+        ngram1FreqDf <- ngramFreqDfFun(trainSample, 1)
+        ngram2FreqDf <- ngramFreqDfFun(trainSample, 2) %>%
+                filter(freq > 1)
+        ngram3FreqDf <- ngramFreqDfFun(trainSample, 3)%>%
+                filter(freq > 1)
+        
+                head(ngram1FreqDf); head(ngram2FreqDf); head(ngram3FreqDf)
+# Model predictions
+                # https://www.r-bloggers.com/2017/05/5-ways-to-measure-running-time-of-r-code/
+
+        timeSBOVect <- system.time(
+                # model prediction
+                bestSBODf <- getBestSBODf("I want to fuck")
+                )
+        sboTime <- timeSBOVect[3]
+        bestSBOValue <- bestSBODf[1,1]
+        
+        timeKBOVect <- system.time(
+                # model prediction
+                bestKBODf <- getBestKBODf("I want to fuck")
+                )
+        kboTime <- timeKBOVect[3]
+        bestKBOValue <- bestKBODf[1,1]
+
+        Sys.time()
         
         
+          1.53 / 0.03
+          

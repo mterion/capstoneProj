@@ -1,46 +1,48 @@
-#=========================================
-# Intro
-#=========================================
+# #=========================================
+# # Intro
+# #=========================================
+# 
+#         rm(list = ls())
+#         library(quanteda)
+#         library(dplyr)
+#         library(stringi)
+#         library(stringr)
+#         library(crayon) # for cat colors green
+#         
+#         source("./rcode/functionKBO1.R")
+#         
+# #=========================================
+# # Corpus creation
+# #=========================================
+# 
+#         ltcorpus <- readLines("./data/testCorpus1.txt")
+#         ltcorpus
+#         toks <- tokens(ltcorpus, remove_punct = TRUE)
+#         toks <- tokens_tolower(toks)
+#     
+# #=========================================
+# # Function to create ngram frequency tables from the corpus
+# #=========================================
+#         
+#     ngramFreqDfFun <- function(tokensOfTheCorpus, ngramValue){
+#         tokNgram <- tokens_ngrams(tokensOfTheCorpus, ngramValue)
+#         ngramDfm <- dfm(tokNgram)
+#         featNames <- featnames(ngramDfm)
+#         freq <- colSums(ngramDfm)
+#         ngramFreqDf <- data.frame(featNames, freq)
+#                 rm(ngramDfm, featNames, freq)
+#                 rownames(ngramFreqDf) <- c() # Remove row names and replace them with ID nr   
+#         
+#         return(ngramFreqDf)
+#         }
+# 
+#     ngram1FreqDf <- ngramFreqDfFun(toks, 1)
+#     ngram2FreqDf <- ngramFreqDfFun(toks, 2)
+#     ngram3FreqDf <- ngramFreqDfFun(toks, 3)
+#           ngram1FreqDf; ngram2FreqDf; ngram3FreqDf
 
-        rm(list = ls())
-        library(quanteda)
-        library(dplyr)
-        library(stringi)
-        library(stringr)
-        library(crayon) # for cat colors green
-        
-        source("./rcode/functionKBO1.R")
-        
-#=========================================
-# Corpus creation
-#=========================================
 
-        ltcorpus <- readLines("./data/testCorpus1.txt")
-        ltcorpus
-        toks <- tokens(ltcorpus, remove_punct = TRUE)
-        toks <- tokens_tolower(toks)
     
-#=========================================
-# Function to create ngram frequency tables from the corpus
-#=========================================
-        
-    ngramFreqDfFun <- function(tokensOfTheCorpus, ngramValue){
-        tokNgram <- tokens_ngrams(tokensOfTheCorpus, ngramValue)
-        ngramDfm <- dfm(tokNgram)
-        featNames <- featnames(ngramDfm)
-        freq <- colSums(ngramDfm)
-        ngramFreqDf <- data.frame(featNames, freq)
-                rm(ngramDfm, featNames, freq)
-                rownames(ngramFreqDf) <- c() # Remove row names and replace them with ID nr   
-        
-        return(ngramFreqDf)
-        }
-
-    ngram1FreqDf <- ngramFreqDfFun(toks, 1)
-    ngram2FreqDf <- ngramFreqDfFun(toks, 2)
-    ngram3FreqDf <- ngramFreqDfFun(toks, 3)
-          ngram1FreqDf; ngram2FreqDf; ngram3FreqDf
-      
 #=========================================
     # Main function    
 #=========================================
@@ -154,14 +156,16 @@ getBestKBODf <- function(userInput_, kValue_ = 2, gamma1Discount_ = 0.5, gamma2D
                 cat(green("Unobserved ngram3\n"))
                 boNgram3ProbDf <- rbind(unobsBoNgram3ProbDf, ngram3DiscProbaDf) %>%
                         arrange(desc(prob)) %>%
-                        mutate(featNames = str_split_fixed(featNames, "_", 3)[, 3])
+                        mutate(featNames = str_split_fixed(featNames, "_", 3)[, 3])  %>% 
+                        slice_head(n = 10)
                 
                         # Check
                         sum(boNgram3ProbDf$prob)
                         
                         # If both prefix words unknown in the whole vocabulary
                         if (is.na(sum(boNgram3ProbDf$prob))) { # this means that both words of the ngram2Prefix are unknown in the whole vocabulary, then simply need to take the highest ngram1 proba 
-                                ngram1ProbDf <- getNgram1Prob(ngram1FreqDf)
+                                ngram1ProbDf <- getNgram1Prob(ngram1FreqDf)%>% 
+                                slice_head(n = 10)
                                 return(ngram1ProbDf)
                         } else {
                                 return(boNgram3ProbDf)  
@@ -171,4 +175,4 @@ getBestKBODf <- function(userInput_, kValue_ = 2, gamma1Discount_ = 0.5, gamma2D
 
     
         
-getBestKBODf("I want to fuck fuck") 
+# getBestKBODf("I want to buy a") 

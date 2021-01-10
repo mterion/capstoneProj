@@ -51,7 +51,7 @@
 # changed 3 into 2
         toksCAll5 <- tokens_select(toksCAll2, pattern = "([0-9]+)", selection="remove", valuetype = "regex", padding = TRUE)
         saveRDS(toksCAll5, "./data/processedData/toksCAll5.RDS")
-                rm(toksCAll4)
+                rm(toksCAll2)
                 # head(toksCAll5, 3)
                 
 # Remove dirty words
@@ -76,6 +76,9 @@
         
         toksCAllSW <- tokens_remove(toksCAll6, pattern = unsigWordsDf$word, valuetype = "fixed", padding=TRUE ) # fixed for exact matching
                 rm(toksCAll6, unsigWords, unsigWordsDf)
+                
+        # remove empty tokens        
+        toksCAllSW <- tokens_select(toksCAllSW, "", selection = "remove", valuetype = "fixed")
                 # head(toksCAllSW, 3)
 
 # Remove stop words
