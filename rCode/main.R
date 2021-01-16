@@ -5,6 +5,13 @@
         .rs.restartR()  
         rm(list = ls()) # Is it needed ?
 
+## Increase memory limit
+        Sys.info()
+        memory.limit()
+        memory.size()
+        memory.limit(size = 30000)
+        gc()        # And gc() regularly in code as well
+        
 ## Load libraries
         library(quanteda)
         library(readtext)

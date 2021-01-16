@@ -1,6 +1,7 @@
 # ngram creation with ngram FreqDf
 
     ngramFreqDfFun <- function(tokensOfTheCorpus, ngramValue){
+        gc()
         tokNgram <- tokens_ngrams(tokensOfTheCorpus, ngramValue)
         ngramDfm <- dfm(tokNgram)
         featNames <- featnames(ngramDfm)
