@@ -80,65 +80,122 @@ getTrainTestResults <- function(trainSampleNr_, testSampleNr_, n2FreqMin_, n3Fre
             trainSample <- tokens_sample(toksCAllTrain, sizeTrain)
                 #head(trainSample); tail(trainSample)
             
-            ngram1FreqDf <<- ngramFreqDfFun(trainSample, 1)
-            ngram2FreqDf <<- ngramFreqDfFun(trainSample, 2) %>%
-                    filter(freq > freqMin_) # origin is 1
-            ngram3FreqDf <<- ngramFreqDfFun(trainSample, 3)%>%
-                    filter(freq > freqMin_) # origin is 1 
+            # ngram1FreqDf <<- ngramFreqDfFun(trainSample, 1)
+            # ngram2FreqDf <<- ngramFreqDfFun(trainSample, 2) %>%
+            #         filter(freq > freqMin_) # origin is 1
+            # ngram3FreqDf <<- ngramFreqDfFun(trainSample, 3)%>%
+            #         filter(freq > freqMin_) # origin is 1 
+                        
+            ngram1FreqDf <<- ngram1TrainFreqDfFull
+            ngram2FreqDf <<- ngram2TrainFreqDfFull %>%
+                                filter(freq > freqMin_) # origin is 1
+            ngram3FreqDf <<- ngram3TrainFreqDfFull%>%
+                                filter(freq > freqMin_) # origin is 1            
             
                     #head(ngram1FreqDf); head(ngram2FreqDf); head(ngram3FreqDf)
+            nRowN1 <- nrow(ngram1FreqDf)
+            nRowN2 <- nrow(ngram2FreqDf)
+            nRowN3 <- nrow(ngram3FreqDf)
             
-    # Test set
-            # random sample of 1000
-            sizeTestDoc <- testSampleNr_
-            testSample <- tokens_sample(toksCAllTest, sizeTestDoc)
-    
-            # Create ngram5
-            testSampleNgram5 <- ngramFreqDfFun(testSample, 5) %>%
-                    filter(!is.na(featNames)) # remove NA due to ngram5 not created bec of short sentence
-                    #head(testSampleNgram5); tail(testSampleNgram5)
-                    
-            # Retake a sample from all ngram4 corresponding to the nr of doc wanted in the sample (sizeTestDoc)
-            testSampleFinalDf <- testSampleNgram5[sample(nrow(testSampleNgram5), sizeTestDoc), ]
-                    
-            testResultDf <- testSampleFinalDf %>%
-                    select(-freq) %>%
-                    mutate(wi_4= str_split_fixed(featNames, "_", 5)[, 1]) %>%
-                    mutate(wi_3= str_split_fixed(featNames, "_", 5)[, 2]) %>%
-                    mutate(wi_2= str_split_fixed(featNames, "_", 5)[, 3]) %>%
-                    mutate(wi_1= str_split_fixed(featNames, "_", 5)[, 4]) %>%
-                    mutate(wi= str_split_fixed(featNames, "_", 5)[, 5]) %>%
-                    mutate(wi4_1 = sprintf("%s %s %s %s",wi_4, wi_3, wi_2, wi_1)) %>%
-                    select(featNames, wi4_1, wi) 
-            # SBO Process
-            startTime <- Sys.time()
-            testResultDf <- testResultDf %>%
+            
+    # # Test set
+    #         # random sample of 1000
+    sizeTestDoc <- testSampleNr_
+            
+    #         testSample <- tokens_sample(toksCAllTest, sizeTestDoc)
+    # 
+    #         # Create ngram5
+    #         testSampleNgram5 <- ngramFreqDfFun(testSample, 5) %>%
+    #                 filter(!is.na(featNames)) # remove NA due to ngram5 not created bec of short sentence
+    #                 #head(testSampleNgram5); tail(testSampleNgram5)
+    #                 
+    #         # Retake a sample from all ngram4 corresponding to the nr of doc wanted in the sample (sizeTestDoc)
+    #         testSampleFinalDf <- testSampleNgram5[sample(nrow(testSampleNgram5), sizeTestDoc), ]
+    #                 
+    #         testResultDf <- testSampleFinalDf %>%
+    #                 select(-freq) %>%
+    #                 mutate(wi_4= str_split_fixed(featNames, "_", 5)[, 1]) %>%
+    #                 mutate(wi_3= str_split_fixed(featNames, "_", 5)[, 2]) %>%
+    #                 mutate(wi_2= str_split_fixed(featNames, "_", 5)[, 3]) %>%
+    #                 mutate(wi_1= str_split_fixed(featNames, "_", 5)[, 4]) %>%
+    #                 mutate(wi= str_split_fixed(featNames, "_", 5)[, 5]) %>%
+    #                 mutate(wi4_1 = sprintf("%s %s %s %s",wi_4, wi_3, wi_2, wi_1)) %>%
+    #                 select(featNames, wi4_1, wi) 
+            
+       # SBO Process
+            testResultDf1 <- testResultDf %>%
                     rowwise() %>%
-                    mutate(bestSBO = getBestSBOVal(wi4_1))
-            endTime <- Sys.time()
-            timeSBO <- (endTime-startTime) / testSampleNr_
-
-            # KBO Process
-            startTime <- Sys.time()            
-            testResultDf <- testResultDf %>%
+                    mutate(bestSBO = getBestSBOVal(wi4_1)) %>%
                     mutate(bestKBO = getBestKBOVal(wi4_1))
-            endTime <- Sys.time()
-            timeKBO <- (endTime-startTime) / testSampleNr_
             
             # Add results
-            testResultDf <- testResultDf %>%
+            testResultDf1 <- testResultDf1 %>%
                     mutate(hitSBO = ifelse(bestSBO==wi, 1, 0)) %>% 
                     mutate(hitKBO = ifelse(bestKBO==wi, 1, 0))
                     
-            hitSBOPercent <- sum(testResultDf$hitSBO) / (testSampleNr_ / 100) # This will always return a %
-            hitKBOPercent <- sum(testResultDf$hitKBO) / (testSampleNr_ / 100)
+            hitSBOPercent <- sum(testResultDf1$hitSBO) / (testSampleNr_ / 100) # This will always return a %
+            hitKBOPercent <- sum(testResultDf1$hitKBO) / (testSampleNr_ / 100)
+
+        # Time
+                    # SBO time elapsed
+                        # system.time return the result in seconds
+                timeSBO1 <- system.time(getBestSBOVal(testResultDf1$wi4_1[1])); timeSBO1 <- timeSBO1[3]
+                timeSBO2 <- system.time(getBestSBOVal(testResultDf1$wi4_1[2])); timeSBO2 <- timeSBO2[3]
+                timeSBO3 <- system.time(getBestSBOVal(testResultDf1$wi4_1[3])); timeSBO3 <- timeSBO3[3]
+                timeSBO4 <- system.time(getBestSBOVal(testResultDf1$wi4_1[4])); timeSBO4 <- timeSBO4[3]
+                timeSBO5 <- system.time(getBestSBOVal(testResultDf1$wi4_1[5])); timeSBO5 <- timeSBO5[3]
+                timeSBO6 <- system.time(getBestSBOVal(testResultDf1$wi4_1[6])); timeSBO6 <- timeSBO6[3]
+                timeSBO7 <- system.time(getBestSBOVal(testResultDf1$wi4_1[7])); timeSBO7 <- timeSBO7[3]
+                timeSBO8 <- system.time(getBestSBOVal(testResultDf1$wi4_1[8])); timeSBO8 <- timeSBO8[3]
+                timeSBO9 <- system.time(getBestSBOVal(testResultDf1$wi4_1[9])); timeSBO9 <- timeSBO9[3]
+                timeSBO10 <- system.time(getBestSBOVal(testResultDf1$wi4_1[10])); timeSBO10 <- timeSBO10[3]
     
-            summaryDf <- data.frame(trainSet = sizeTrain, freqMin = freqMin_, testSetSample = sizeTestDoc, SBOHitPer = hitSBOPercent, KBOHitPer = hitKBOPercent, SBOTime = timeSBO,  KBOTime = timeKBO)
+            timeSBO <- (timeSBO1 + timeSBO2 + timeSBO3 + timeSBO4 + timeSBO5 + timeSBO6 + timeSBO7 + timeSBO8 + timeSBO9 + timeSBO10) / 10
+        
+                timeKBO1 <- system.time(getBestKBOVal(testResultDf1$wi4_1[1])); timeKBO1 <- timeKBO1[3]
+                timeKBO2 <- system.time(getBestKBOVal(testResultDf1$wi4_1[2])); timeKBO2 <- timeKBO2[3]
+                timeKBO3 <- system.time(getBestKBOVal(testResultDf1$wi4_1[3])); timeKBO3 <- timeKBO3[3]
+                timeKBO4 <- system.time(getBestKBOVal(testResultDf1$wi4_1[4])); timeKBO4 <- timeKBO4[3]
+                timeKBO5 <- system.time(getBestKBOVal(testResultDf1$wi4_1[5])); timeKBO5 <- timeKBO5[3]
+                timeKBO6 <- system.time(getBestKBOVal(testResultDf1$wi4_1[6])); timeKBO6 <- timeKBO6[3]
+                timeKBO7 <- system.time(getBestKBOVal(testResultDf1$wi4_1[7])); timeKBO7 <- timeKBO7[3]
+                timeKBO8 <- system.time(getBestKBOVal(testResultDf1$wi4_1[8])); timeKBO8 <- timeKBO8[3]
+                timeKBO9 <- system.time(getBestKBOVal(testResultDf1$wi4_1[9])); timeKBO9 <- timeKBO9[3]
+                timeKBO10 <- system.time(getBestKBOVal(testResultDf1$wi4_1[10])); timeKBO10 <- timeKBO10[3]
+                
+            
+            timeKBO <- (timeKBO1 + timeKBO2 + timeKBO3 + timeKBO4 + timeKBO5 + timeKBO6 + timeKBO7 + timeKBO8 + timeKBO9 + timeKBO10) / 10
+            
+                
+            summaryDf <- data.frame(trainSet = sizeTrain, freqMin = freqMin_, testSetSample = sizeTestDoc, SBOHitPer = hitSBOPercent, KBOHitPer = hitKBOPercent, SBOTime = timeSBO,  KBOTime = timeKBO, n1Nr = nRowN1, n2Nr = nRowN2, n3Nr = nRowN3)
             rownames(summaryDf) <- NULL
             return(summaryDf)
     } 
 
-
+# Get test sample
+          getTestSampleDf <- function(testSampleNr_){
+                sizeTestDoc <- testSampleNr_
+                testSample <- tokens_sample(toksCAllTest, sizeTestDoc)
+        
+                # Create ngram5
+                testSampleNgram5 <- ngramFreqDfFun(testSample, 5) %>%
+                        filter(!is.na(featNames)) # remove NA due to ngram5 not created bec of short sentence
+                        #head(testSampleNgram5); tail(testSampleNgram5)
+                        
+                # Retake a sample from all ngram4 corresponding to the nr of doc wanted in the sample (sizeTestDoc)
+                testSampleFinalDf <- testSampleNgram5[sample(nrow(testSampleNgram5), sizeTestDoc), ]
+                        
+                testResultDf <- testSampleFinalDf %>%
+                        select(-freq) %>%
+                        mutate(wi_4= str_split_fixed(featNames, "_", 5)[, 1]) %>%
+                        mutate(wi_3= str_split_fixed(featNames, "_", 5)[, 2]) %>%
+                        mutate(wi_2= str_split_fixed(featNames, "_", 5)[, 3]) %>%
+                        mutate(wi_1= str_split_fixed(featNames, "_", 5)[, 4]) %>%
+                        mutate(wi= str_split_fixed(featNames, "_", 5)[, 5]) %>%
+                        mutate(wi4_1 = sprintf("%s %s %s %s",wi_4, wi_3, wi_2, wi_1)) %>%
+                        select(featNames, wi4_1, wi)
+                return(testResultDf)
+          }
 
 
 

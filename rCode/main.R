@@ -9,7 +9,7 @@
         Sys.info()
         memory.limit()
         memory.size()
-        memory.limit(size = 30000)
+        memory.limit(size = 60000)
         gc()        # And gc() regularly in code as well
         
 ## Load libraries
@@ -62,7 +62,19 @@
 # NGrams operations
         source("./rCode/finalScripts/dataNGram.R")
         
+# Data partition
+        source("./rCode/finalScripts/dataPartitionFull.R")
 
+# Minimal frequency threshold for ngram2 and ngram3 - > compared to processing time and accuracy
+        source("./rCode/finalScripts/minimalFrequencyTable.R")
+        
+# Test of the algo on the test set
+        source("./rCode/finalScripts/test.R")  
+        
+        
+
+        
+        
 # Document-feature matrix and feature co-occurence matrix
         #source("./rCode/rawCode/dfm_fcm.R")
 

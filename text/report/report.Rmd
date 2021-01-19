@@ -178,7 +178,7 @@ The characteristics of the languages from Twitts where the same words can be rep
 ``` 
 
 
-#### Semantic network analys {.tabset}
+#### Semantic network analysis {.tabset}
 Semantic relations between words (n-grams1) are displayed underneath. A feature co-occurence matrix was constructed in order to analyze the patterns of the 50 most frequent words from each source. The intensity of the relations between words shows interesting patterns. 
 
 Twitts, beside highlighting a specific abbreviated type of language, show stronger co-occurence of words related to emotions (great, time, thanks, happy...) and a time frame limited to activities carried out now (day, morning, weekend, time, today...). On the other end of the spectrum, and not surprisingly, news are detached from emotions:  Co-occurences of words are factual and the time frame window is much larger. Finally, blogs appear to in a category between those two extremes, having more factual content than twitts but still being emotionally related.
@@ -247,20 +247,6 @@ To assess the efficiency of the different models the documents from the main dat
 
 * Split into two subset, a train set and test set, following a 80%-20% ratio
 * The train set contained 3'415'739 documents and the test set 853'939 documents
-* The training / testing procedure is the following:
-    + A first samples of 10'000 documents is randomly selected from the train set
-    + Both models are trained on this first sample
-    + Both models one 1000 random samples selected from test set
-    + Speed and accuracy are registered
-    + A new train sample is randomly selected by adding the step of 10'000 to the size of the preceding sample
-    + Both models are trained on this new sample and tested on the whole test set.
-    + This sequential procedure of increasing training sample size with steps of 10'000 is repeated until reaching the size of the whole train set (3'415'739 documents)
-
-It should be noted that to increase the computing speed of both model procedures, the ngram3 and ngram2 with a frequency of 1 were removed. This means that much memory could be saved and back-off models were activated more quickly when needed. This in the end drastically increased the computing speed of both models. 
-
-* For a test conducted on random sample of 10000 documents, it increased the computing speed by:
-    + 51 times for the SBO model
-    + 26 times for the KBO model
 
 #### SBO
 A simple model is the SBO which does not generate probabilities or apply discount, but use relative frequencies interpreted as a score "S". A SBO model is relatively inexpensive to train and works well on large corpora^[https://www.aclweb.org/anthology/D07-1090.pdf] 
@@ -338,6 +324,25 @@ Finally, the missing probability mass is assigned to unobserved ngram :
     + Where $B$ means all the remaining words in the vocabulary.
 
 In the very unlikely case that both words constituting the last words of the user input are both unknown in the whole vocabulary of the Corpus, the $P_{ML}$ of ngram1 are returned.
+
+### 2.3.3 Processing time vs accuracy
+A balance needed to be reached between processing time versus accuracy. In ngrams models, the amount of ngram2 and ngram3 quickly become huge, increasing drastically the processing time needed for the algorithms to produce a result. As an example, for the whole train set, after considering only 95% of the vocabulary, the amount of ngram1 amounts to 19'937, to more than 7 millions for ngram2 and to more than 28 millions for ngram3. Therefore, despite the reduction in vocabulary size and the optimization done on both algorithms, it still required more than 127 seconds for the SBO function or 180 second to the KBO function to return a result.
+
+The methodology adopted to solve this problem was to reduce the total amount of n-grams to be processed and to find a threshold at which the processing time would be smaller than 1 second, threshold deemed acceptable for the user of a mobile device. This was done by:
+
+* Covering only 95% of the vocabulary, which means moving in the train set from 683'158 unique words to 19'937 (ngram1)
+* Further reducing the amount of ngram2 and ngram3 by finding the best minimal frequency threshold in regard to processing time (< 1 sec.)
+
+The following table highlights that the optimal minimal frequency for both ngram2 and ngram3 is 21. It appears to be a good balance between accuracy and processing time, as it allows good accuracy and results to be returned in less than 1 second (0.586). This table was made on a sample from 10 test sentences. Therefore, the percentage of success from both algorithms should not be considered as significant. 
+
+Nevertheless, the accuracy trend highlights a very interesting point: despite the reduction in the number of ngram2 and ngram3, the accuracy paradoxically increased from 20% to 30%. The explanation is that given the fact that a sequence analyzed is at best limited to three words (ngram3), the probability of having a third word followed by two other words was higher for a certain ngram3. When the reduction operated on ngram3 removed this sequence, it activated the back off model which finally produced the correct result on a shorter sequence. 
+
+This point emphasizes the weakness of an approach based on n-grams model, limited to a sequence of maximum three words due to processing time constraints and further not taking into consideration the context of whole sentences or longer sequences. A deep learning model approach will later be developed to address those issues.
+
+```{r sumFreqChecksTable, out.width = "100%", fig.align = "left"}
+        sumFreqChecksTable <- readRDS("./figures/finalFigures/sumFreqChecksTable.RDS")
+        sumFreqChecksTable
+```
 
 
 ### 2.4 Results
