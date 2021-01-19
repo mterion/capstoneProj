@@ -5,11 +5,11 @@ getTrainTestResults <- function(trainSampleNr_, testSampleNr_, n2FreqMin_, n3Fre
         trainSample <- tokens_sample(toksCAllTrain, sizeTrain)
             #head(trainSample); tail(trainSample)
         
-        ngram1FreqDf <<- ngramFreqDfFun(trainSample, 1)
-        ngram2FreqDf <<- ngramFreqDfFun(trainSample, 2) %>%
-                filter(freq > n2FreqMin_) # origin is 1
-        ngram3FreqDf <<- ngramFreqDfFun(trainSample, 3)%>%
-                filter(freq > n3FreqMin_) # origin is 1 
+            ngram1FreqDf <<- ngram1TrainFreqDfFull
+            ngram2FreqDf <<- ngram2TrainFreqDfFull %>%
+                                filter(freq > n2FreqMin_)
+            ngram3FreqDf <<- ngram3TrainFreqDfFull%>%
+                                filter(freq > n3FreqMin_)    
         
                 #head(ngram1FreqDf); head(ngram2FreqDf); head(ngram3FreqDf)
         
@@ -41,31 +41,12 @@ getTrainTestResults <- function(trainSampleNr_, testSampleNr_, n2FreqMin_, n3Fre
                 mutate(bestKBO = getBestKBOVal(wi4_1)) %>%
                 mutate(hitSBO = ifelse(bestSBO==wi, 1, 0)) %>% 
                 mutate(hitKBO = ifelse(bestKBO==wi, 1, 0))
+                    # head(testResultDf)
                 
-        
-                # head(testResultDf)
-                
-        # SBO time elapsed
-            timeSBO1 <- system.time(getBestSBOVal(testResultDf$wi4_1[1])); timeSBO1 <- timeSBO1[3]
-            timeSBO2 <- system.time(getBestSBOVal(testResultDf$wi4_1[2])); timeSBO2 <- timeSBO2[3]
-            timeSBO3 <- system.time(getBestSBOVal(testResultDf$wi4_1[3])); timeSBO3 <- timeSBO3[3]
-            timeSBO4 <- system.time(getBestSBOVal(testResultDf$wi4_1[4])); timeSBO4 <- timeSBO4[3]
-            timeSBO5 <- system.time(getBestSBOVal(testResultDf$wi4_1[5])); timeSBO5 <- timeSBO5[3]
-    
-        timeSBO <- (timeSBO1 + timeSBO2 + timeSBO3 + timeSBO4 + timeSBO5) / 5
-        
-            timeKBO1 <- system.time(getBestKBOVal(testResultDf$wi4_1[1])); timeKBO1 <- timeKBO1[3]
-            timeKBO2 <- system.time(getBestKBOVal(testResultDf$wi4_1[2])); timeKBO2 <- timeKBO2[3]
-            timeKBO3 <- system.time(getBestKBOVal(testResultDf$wi4_1[3])); timeKBO3 <- timeKBO3[3]
-            timeKBO4 <- system.time(getBestKBOVal(testResultDf$wi4_1[4])); timeKBO4 <- timeKBO4[3]
-            timeKBO5 <- system.time(getBestKBOVal(testResultDf$wi4_1[5])); timeKBO5 <- timeKBO5[3]
-            
-        timeKBO <- (timeKBO1 + timeKBO2 + timeKBO3 + timeKBO4 + timeKBO5) / 5
-
         hitSBOPercent <- sum(testResultDf$hitSBO) / 100 # divided by 10 to get % because the sample is on 1000
         hitKBOPercent <- sum(testResultDf$hitKBO) / 100
 
-        summaryDf <- data.frame(trainSet = sizeTrain, testSetSample = sizeTestDoc, SBOHitPer = hitSBOPercent, KBOHitPer = hitKBOPercent, SBOTime = timeSBO,  KBOTime = timeKBO)
+        summaryDf <- data.frame(trainSet = sizeTrain, testSetSample = sizeTestDoc, SBOHitPer = hitSBOPercent, KBOHitPer = hitKBOPercent)
         rownames(summaryDf) <- 1
         return(summaryDf)
 }                
