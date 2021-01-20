@@ -30,9 +30,8 @@ The research question addressed is : "How can an efficient text predicitve model
 #### 1.3.3 Outline of the report
 -->
 
-## 2. Sections
-### 2.1 Data
-#### 2.1.1 Raw data
+## 2 Data
+### 2.1 Raw data
 ```{r rawNr, include = FALSE}
 nrOfLinesTotal <- format(readRDS("./figures/finalFigures/nrOfLinesTotal.RDS"), big.mark = "'")
 nrOfWordsTotal <- format(readRDS("./figures/finalFigures/nrOfWordsTotal.RDS"), big.mark = "'")
@@ -44,7 +43,7 @@ rm(nrOfLinesTotal, nrOfWordsTotal)
 readRDS("./figures/finalFigures/fSumTable.RDS")
 ```
 
-#### 2.1.2 Data characteristics
+### 2.1 Data characteristics
 A preliminary investigation was conducted to understand data properties, patterns and suggest modelling strategies. The following histograms show the distribution of words across the different file sources.
 ```{r histWordCount, fig.height = 6.5}
 readRDS("./figures/finalFigures/histWordCount.RDS")
@@ -60,7 +59,7 @@ The following violin plots show the full distribution of words across each sourc
 readRDS("./figures/finalFigures/violinWordCount.RDS")
 ```
 
-#### 2.1.3 Data pre-processing
+### 2.1 Data pre-processing
 Before conducting analysis and developping models, the data needed to be pre-processed. The sequence applied is the following:
 
 * Corpus creation: All documents from the three different sources were merged into a single corpus.
@@ -78,10 +77,8 @@ Before conducting analysis and developping models, the data needed to be pre-pro
 After following this pre-processing sequence, the data contained in the corpus was deemed ready for further analysis and model development.
 
 
-### 2.2 Methods
-### 2.3 Analysis
-### 2.3.1 Exploratory analysis 
-#### n-grams bar plots {.tabset}
+## 3 Exploratory analysis 
+### 3.1 n-grams bar plots {.tabset}
 N-grams are extensively used in natural language processing tasks; they are a set of co-occuring words within a given window. For example, if n-grams = 1, all words of the corpus will be listed one after the other. If n-grams = 2, it will take the word and one word forward, aggregate them and move to the next world. 
 
 Here is an example for n-grams = 2, the sentence being "here is an ngram demo": 
@@ -94,137 +91,137 @@ Here is an example for n-grams = 2, the sentence being "here is an ngram demo":
 For this research, the values of n-grams = 1, 2, 3 were considered. The following pannel plot display 15 of the most frequent features for each n-grams value and data source.
 
 
-##### nGrams1
+#### nGrams1
 ```{r nGram1BarPlot, fig.height= 6}
       readRDS("./figures/finalFigures/pannelFeatPlotNGram1.RDS")
 ```
 
 
-##### nGrams2
+#### nGrams2
 ```{r nGram2BarPlot}
       readRDS("./figures/finalFigures/pannelFeatPlotNGram2.RDS")
 ```
 
-##### nGrams3
+#### nGrams3
 ```{r nGram3BarPlot, fig.height= 6}
       readRDS("./figures/finalFigures/pannelFeatPlotNGram3.RDS")
 ``` 
 
 
-#### n-grams tables {.tabset}
+### 3.2 n-grams tables {.tabset}
 To enable an in depth analysis of the data and its structure, the following table provides a detailed review of the 50'000 most frequent features for each source, across the three n-grams values. 
 
 The characteristics of the languages from Twitts where the same words can be repeated a few consecutive time (e.g. Fun, fun, fun!) should be noted. Such characteristics are totally absent in news, where the language is more formal. The same occur with word abbreviations, for example "u" versus "you".
 
 
-##### n1A
+#### n1A
 ```{r n1A}
         readRDS("./figures/finalFigures/nGram_1_TableAll.RDS")
 ``` 
 
-##### n1B
+#### n1B
 ```{r n1B}
         readRDS("./figures/finalFigures/nGram_1_TableBlogs.RDS")
 ``` 
 
-##### n1N
+#### n1N
 ```{r n1N}
         readRDS("./figures/finalFigures/nGram_1_TableNews.RDS")
 ``` 
 
-##### n1T
+#### n1T
 ```{r n1T}
         readRDS("./figures/finalFigures/nGram_1_TableTwitts.RDS")
 ``` 
 
-##### n2A
+#### n2A
 ```{r n2A}
         readRDS("./figures/finalFigures/nGram_2_TableAll.RDS")
 ``` 
 
-##### n2B
+#### n2B
 ```{r n2B}
         readRDS("./figures/finalFigures/nGram_2_TableBlogs.RDS")
 ``` 
 
-##### n2N
+#### n2N
 ```{r n2N}
         readRDS("./figures/finalFigures/nGram_2_TableNews.RDS")
 ``` 
 
-##### n2T
+#### n2T
 ```{r n2T}
         readRDS("./figures/finalFigures/nGram_2_TableTwitts.RDS")
 ``` 
 
-##### n3A
+#### n3A
 ```{r n3A}
         readRDS("./figures/finalFigures/nGram_3_TableAll.RDS")
 ``` 
 
-##### n3B
+#### n3B
 ```{r n3B}
         readRDS("./figures/finalFigures/nGram_3_TableBlogs.RDS")
 ``` 
 
-##### n3N
+#### n3N
 ```{r n3N}
         readRDS("./figures/finalFigures/nGram_3_TableNews.RDS")
 ``` 
 
-##### n3T
+#### n3T
 ```{r n3T}
         readRDS("./figures/finalFigures/nGram_3_TableTwitts.RDS")
 ``` 
 
 
-#### Semantic network analysis {.tabset}
+### 3.3 Semantic network analysis {.tabset}
 Semantic relations between words (n-grams1) are displayed underneath. A feature co-occurence matrix was constructed in order to analyze the patterns of the 50 most frequent words from each source. The intensity of the relations between words shows interesting patterns. 
 
 Twitts, beside highlighting a specific abbreviated type of language, show stronger co-occurence of words related to emotions (great, time, thanks, happy...) and a time frame limited to activities carried out now (day, morning, weekend, time, today...). On the other end of the spectrum, and not surprisingly, news are detached from emotions:  Co-occurences of words are factual and the time frame window is much larger. Finally, blogs appear to in a category between those two extremes, having more factual content than twitts but still being emotionally related.
 
-##### sNetwAll
+#### sNetwAll
 ```{r sNetwAll}
         readRDS("./figures/finalFigures/semNetwCAll.RDS")
 ``` 
 
-##### sNetwBlogs
+#### sNetwBlogs
 ```{r sNetBlogs}
         readRDS("./figures/finalFigures/semNetwCBlogs.RDS")
 ```
 
-##### sNetwNews
+#### sNetwNews
 ```{r sNetwNews}
         readRDS("./figures/finalFigures/semNetwCNews.RDS")
 ```
 
-##### sNetwTwitts
+#### sNetwTwitts
 ```{r sNetwTwitts}
         readRDS("./figures/finalFigures/semNetwCTwitts.RDS")
 ``` 
 
 
-#### n-grams tables with stop words {.tabset}
+### 3.4 n-grams tables with stop words {.tabset}
 To understand the particularities of the content of the different sources, stop words (e.g. a, and, but, how, etc.) were removed in the previous tables and analyses. Nevertheless, a predictive model that should help the user predict the next word when using his mobile device, requires to integrate stop words in model prediction. Therefore, the next table provide an overview of the integrated dataset, with the inclusion of stop words.
 
 
-##### n1ASW
+#### n1ASW
 ```{r n1ASW}
         readRDS("./figures/finalFigures/nGram_1_TableAllSW.RDS")
 ``` 
 
-##### n2ASW
+#### n2ASW
 ```{r n2ASW}
         readRDS("./figures/finalFigures/nGram_2_TableAllSW.RDS")
 ``` 
 
-##### n3ASW
+#### n3ASW
 ```{r n3ASW}
         readRDS("./figures/finalFigures/nGram_3_TableAllSW.RDS")
 ``` 
 
 
-#### Number of unique words
+### 3.5 Number of unique words
 ```{r totalNrWord, include = FALSE}
 nrWordC <- format(readRDS("./figures/finalFigures/nrWordC.RDS"), big.mark = "'")
 coverage0.5 <- format(readRDS("./figures/finalFigures/coverage0.5.RDS"), big.mark = "'")
@@ -237,16 +234,21 @@ rm(nrWordC, coverage0.5, coverage0.9)
 readRDS("./figures/finalFigures/coverageTable.RDS")
 ```
 
-### 2.3.2 Models{.tabset}
-
+## 4. Models
+### 4.1 Model Comparisons{.tabset}
 #### Summary 
 A statistical language model is a distribution of probabilities over a sequence of word: $P(w_{1},\ w_{2},\ ...,\ w_{m})$.^[https://en.wikipedia.org/wiki/Language_model] 
 In such a language, n-gram are made by considering sequences of words. For example a ngram2 or bigram has the sequence $(w_{i-1},\ w_{i})$ and an ngram3 or trigram the sequence: $(w_{i-2},\ w_{i-1},\ w_{i})$.
 
-To assess the efficiency of the different models the documents from the main data set were:
+For this research two different models and algorithms were developed : the Stupid Backoff model (SBO) and the Katz Backoff model (KBO). The first had a reputation to perform well on large data sets and the second was deemed more precise on small data sets. The details of both algorithms can be consulted by clicking on the right tabs.
 
-* Split into two subset, a train set and test set, following a 80%-20% ratio
-* The train set contained 3'415'739 documents and the test set 853'939 documents
+To test the efficiency of both models, the main data set was split into two subsets: 
+
+* A train set
+    + Which represents 80% of the data: 3'415'739 documents
+* A test set
+    + Which represents 20% of the data: 853'939 documents
+
 
 #### SBO
 A simple model is the SBO which does not generate probabilities or apply discount, but use relative frequencies interpreted as a score "S". A SBO model is relatively inexpensive to train and works well on large corpora^[https://www.aclweb.org/anthology/D07-1090.pdf] 
@@ -325,19 +327,19 @@ Finally, the missing probability mass is assigned to unobserved ngram :
 
 In the very unlikely case that both words constituting the last words of the user input are both unknown in the whole vocabulary of the Corpus, the $P_{ML}$ of ngram1 are returned.
 
-### 2.3.3 Processing time vs accuracy
-A balance needed to be reached between processing time versus accuracy. In ngrams models, the amount of ngram2 and ngram3 quickly become huge, increasing drastically the processing time needed for the algorithms to produce a result. As an example, for the whole train set, after considering only 95% of the vocabulary, the amount of ngram1 amounts to 19'937, to more than 7 millions for ngram2 and to more than 28 millions for ngram3. Therefore, despite the reduction in vocabulary size and the optimization done on both algorithms, it still required more than 127 seconds for the SBO function or 180 second to the KBO function to return a result.
+### 4.2 Processing time vs accuracy
+A balance needed to be reached between processing time versus accuracy. In ngrams models, the amount of ngram2 and ngram3 quickly become huge, increasing drastically the processing time needed for the algorithms to return a result. 
 
-The methodology adopted to solve this problem was to reduce the total amount of n-grams to be processed and to find a threshold at which the processing time would be smaller than 1 second, threshold deemed acceptable for the user of a mobile device. This was done by:
+* As an example, for the whole train set, after considering only 95% of the vocabulary, the amount of ngram1 amounts to 19'937, to more than 7 millions for ngram2 and to more than 28 millions for ngram3. 
+* Therefore, despite the reduction in vocabulary size and the optimization done on both algorithms, it still required more than 127 seconds for SBO or 180 second to KBO to return a single result.
 
-* Covering only 95% of the vocabulary, which means moving in the train set from 683'158 unique words to 19'937 (ngram1)
-* Further reducing the amount of ngram2 and ngram3 by finding the best minimal frequency threshold in regard to processing time (< 1 sec.)
+The solution to this problem was to suit the methodology in order to decrease the total amount of n-grams to be processed. The goal was to find a threshold at which the processing time would be smaller than 1 second, threshold deemed acceptable for the user of a mobile device. This was done by:
 
-The following table highlights that the optimal minimal frequency for both ngram2 and ngram3 is 21. It appears to be a good balance between accuracy and processing time, as it allows good accuracy and results to be returned in less than 1 second (0.586). This table was made on a sample from 10 test sentences. Therefore, the percentage of success from both algorithms should not be considered as significant. 
+* Covering only 95% of the vocabulary, which means moving from the original 683'158 ngram1 of the train set to a final 19'937.
+* Further reducing the amount of ngram2 and ngram3 by finding the best minimal frequency threshold in regard to processing time (< 1 sec) and accuracy.
 
-Nevertheless, the accuracy trend highlights a very interesting point: despite the reduction in the number of ngram2 and ngram3, the accuracy paradoxically increased from 20% to 30%. The explanation is that given the fact that a sequence analyzed is at best limited to three words (ngram3), the probability of having a third word followed by two other words was higher for a certain ngram3. When the reduction operated on ngram3 removed this sequence, it activated the back off model which finally produced the correct result on a shorter sequence. 
+The following table highlights that the optimal minimal frequency for both ngram2 and ngram3 is 21, as it allows good accuracy and results to be returned in less than 1 second (0.586). It should be noted that this table was made on a sample from 10 test sentences. Therefore, the percentage of success from both algorithms should not be considered as significant. The test will be conducted in the next section "2.4 Results". 
 
-This point emphasizes the weakness of an approach based on n-grams model, limited to a sequence of maximum three words due to processing time constraints and further not taking into consideration the context of whole sentences or longer sequences. A deep learning model approach will later be developed to address those issues.
 
 ```{r sumFreqChecksTable, out.width = "100%", fig.align = "left"}
         sumFreqChecksTable <- readRDS("./figures/finalFigures/sumFreqChecksTable.RDS")
@@ -345,14 +347,32 @@ This point emphasizes the weakness of an approach based on n-grams model, limite
 ```
 
 
-### 2.4 Results
+Nevertheless, the trend in accuracy reveals a very interesting point: despite the reduction in the number of ngram2 and ngram3, the accuracy paradoxically increased from 20% to 30%. 
+
+* The explanation is that given the fact that a sequence analyzed is at best limited to three words (ngram3), the probability of having a third word preceeded by two other words was higher for a certain ngram3. 
+    + When the frequency reduction (< 19) operated on ngram3 removed this sequence, it then activated the back off model which finally produced the correct result on the shorter sequence ngram2 with only one word preceding the word predicted. 
+
+This point emphasizes the weakness of an approach based on n-grams model. The limitation is set to a sequence of maximum three words due to processing time constraints. Those probabilistic models do not take into consideration the context of whole sentences or longer sequences. A deep learning model approach will later be developed to address those issues.
 
 
+## 5. Results
+The testing as indicated in the table underneath, was conducted on a random selection of 20'000 samples in the test set. It shows an accuracy of 28% for the KBO and 29% for the SBO algorithms. 
+
+Those are very good results, especially considering that:
+
+* The probabilities are only done, at best, on the two words preceding the word being predicted. 
+    + This shows that such a prediction, without any contexts or longer sequences, could already be of great help to a user.
+* The accuracy is very close between both algorithms.
+    + This is explained by the great size of the training set which negates the advantage that KBO could have add on smaller data sets.
+* An average processing time of 0.59 seconds for SBO and 0.66 seconds for KBO, at a ngram2/ngram3 minimal frequency threshold of 21.
+
+To conclude, given the efficiency demonstrated by the SBO algorithm, the latter will be used for the development of the application. 
 
 
-The different tasks (1-2) answers are the following:
-
-
+```{r testTable, fig.height= 2.05 }
+testTable <- readRDS("./figures/finalFigures/testTable.RDS")
+testTable
+```
  
 
 <!--

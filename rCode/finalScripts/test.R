@@ -2,7 +2,7 @@
 # Sample obs and test function
 #===============================
 # TrainSet -> with 95% vocabulary!!!
-
+        gc()
         toksCAllTrain <- readRDS("./data/processedData/toksTrain95.RDS")
         nrDocTrain <- ndoc(toksCAllTrain)
         
@@ -30,17 +30,46 @@
         processingTime <- endTime-startTime
         
         summaryDf
-        processingTime
+        processingTime # 8.206753 hours
+        
+        saveRDS(summaryDf, "./data/processedData/summaryDf/test_21_20000.RDS")
+        test_21_20000 <- readRDS("./data/processedData/summaryDf/test_21_20000.RDS")
 
-# Coursera test
-        getBestSBOVal("I want")
-        getBestKBOVal("I want")
+
+        testTable <- plot_ly(
+                      type = 'table',
+                      columnwidth = c(50, 50, 50, 50),
+                      columnorder = c(1,2,3,4),
+                      header = list(
+                        values = c("Train Set Doc.", "Test Sample Doc.", "SBO Hits (%)", "KBO Hits (%)"),
+                        align = c("center", "center", "center", "center"),
+                        line = list(width = 1, color = 'black'),
+                        fill = list(color = c("grey", "grey")),
+                        font = list(family = "Arial", size = 14, color = "white")
+                      ),
+                      cells = list(
+                        values = rbind(test_21_20000$trainSet, test_21_20000$testSetSample, test_21_20000$SBOHitPer, test_21_20000$KBOHitPer),
+                        align = c("center", "center", "center", "center"),
+                        line = list(color = "black", width = 1),
+                        font = list(family = "Arial", size = 12, color = c("black"))
+                      ))
+            
+        testTable
+        
+        saveRDS(testTable, "./figures/finalFigures/testTable.RDS")
+        
+        testTable <- readRDS("./figures/finalFigures/testTable.RDS")
+
+        
+        
         
 
 #=============================================================
         ### Trials
 #=============================================================         
-        
+# Coursera test
+        getBestSBOVal("I want")
+        getBestKBOVal("I want")        
                 
 
         # with freq: 15 = 13%, 10 = 16%, 5  = 16% -> 10 seems to be the best ratio betwee computing time and accuracy -> need to confirm this on 1 mio
