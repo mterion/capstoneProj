@@ -2,7 +2,7 @@
 
 # RAN Memory management
         # Restart with a clean fresh session
-        .rs.restartR()  
+        # .rs.restartR()  
         rm(list = ls()) # Is it needed ?
 
 ## Increase memory limit
@@ -69,7 +69,10 @@
         source("./rCode/finalScripts/minimalFrequencyTable.R")
         
 # Test of the algo on the test set
-        source("./rCode/finalScripts/test.R")  
+        source("./rCode/finalScripts/test.R")
+
+# Words on letters
+        source("./rCode/finalScripts/wordOnLetters.R")
         
         
 

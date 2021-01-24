@@ -44,11 +44,31 @@
                 
         row.names(tableFeatFreq) <- 1: nrow(tableFeatFreq)
         
-        featFreq95ToKeepDf <- tableFeatFreq %>%
-                filter(cumSumDivTotalWord <= 0.95)
-        
         featFreq98ToKeepDf <- tableFeatFreq %>%
-                filter(cumSumDivTotalWord <= 0.98)
+                filter(cumSumDivTotalWord <= 0.98) # 60599
+        
+        featFreq95ToKeepDf <- tableFeatFreq %>%
+                filter(cumSumDivTotalWord <= 0.95) # 19949
+        
+        featFreq90ToKeepDf <- tableFeatFreq %>%
+                filter(cumSumDivTotalWord <= 0.90) # 7905
+        
+        featFreq85ToKeepDf <- tableFeatFreq %>%
+                filter(cumSumDivTotalWord <= 0.85) # 4184
+        
+        featFreq80ToKeepDf <- tableFeatFreq %>%
+                filter(cumSumDivTotalWord <= 0.80) # 2448
+        
+        featFreq70ToKeepDf <- tableFeatFreq %>%
+                filter(cumSumDivTotalWord <= 0.70) # 941 word
+        
+        featFreq60ToKeepDf <- tableFeatFreq %>%
+                filter(cumSumDivTotalWord <= 0.60) # 366 words
+        
+        featFreq50ToKeepDf <- tableFeatFreq %>%
+                filter(cumSumDivTotalWord <= 0.50) # 138 words
+        
+        nrow(featFreq85ToKeepDf)
         
         
 # Token words representing 95% of the vocabulary
@@ -67,12 +87,101 @@
         featNamesToksCAllSW98 <- names(colSumToksCAllSW98)
         nrWordCAllSW98 <- length(featNamesToksCAllSW98)
         
+# Token words representing 90% of the vocabulary   
+        toksCAllSW90 <- tokens_select(x = toksCAllSW, pattern = featFreq90ToKeepDf$ngrams, selection = "keep", valuetype = "fixed", padding=TRUE ) # fixed for exact matching
+        
+        dfmToks1CAllSW90 <- dfm(toksCAllSW90, remove="")
+        colSumToksCAllSW90 <- colSums(dfmToks1CAllSW90)
+        featNamesToksCAllSW90 <- names(colSumToksCAllSW90)
+        nrWordCAllSW90 <- length(featNamesToksCAllSW90)
+        
+        wordsSW90Df <- data.frame(word = featNamesToksCAllSW90, freq = colSumToksCAllSW90) %>%
+        arrange(word)
+        row.names(wordsSW90Df) <- NULL
+        
+# Token words representing 85% of the vocabulary   
+        toksCAllSW85 <- tokens_select(x = toksCAllSW, pattern = featFreq85ToKeepDf$ngrams, selection = "keep", valuetype = "fixed", padding=TRUE ) # fixed for exact matching
+        
+        dfmToks1CAllSW85 <- dfm(toksCAllSW85, remove="")
+        colSumToksCAllSW85 <- colSums(dfmToks1CAllSW85)
+        featNamesToksCAllSW85 <- names(colSumToksCAllSW85)
+        nrWordCAllSW85 <- length(featNamesToksCAllSW85)
+        
+        wordsSW85Df <- data.frame(word = featNamesToksCAllSW85, freq = colSumToksCAllSW85) %>%
+        arrange(word)
+        row.names(wordsSW85Df) <- NULL
+        
+# Token words representing 80% of the vocabulary   
+        toksCAllSW80 <- tokens_select(x = toksCAllSW, pattern = featFreq80ToKeepDf$ngrams, selection = "keep", valuetype = "fixed", padding=TRUE ) # fixed for exact matching
+        
+        dfmToks1CAllSW80 <- dfm(toksCAllSW80, remove="")
+        colSumToksCAllSW80 <- colSums(dfmToks1CAllSW80)
+        featNamesToksCAllSW80 <- names(colSumToksCAllSW80)
+        nrWordCAllSW80 <- length(featNamesToksCAllSW80)
+        
+        wordsSW80Df <- data.frame(word = featNamesToksCAllSW80, freq = colSumToksCAllSW80) %>%
+        arrange(word)
+        row.names(wordsSW80Df) <- NULL
+        
+# Token words representing 70% of the vocabulary   
+        toksCAllSW70 <- tokens_select(x = toksCAllSW, pattern = featFreq70ToKeepDf$ngrams, selection = "keep", valuetype = "fixed", padding=TRUE ) # fixed for exact matching
+        
+        dfmToks1CAllSW70 <- dfm(toksCAllSW70, remove="")
+        colSumToksCAllSW70 <- colSums(dfmToks1CAllSW70)
+        featNamesToksCAllSW70 <- names(colSumToksCAllSW70)
+        nrWordCAllSW70 <- length(featNamesToksCAllSW70)
+        
+        wordsSW70Df <- data.frame(word = featNamesToksCAllSW70, freq = colSumToksCAllSW70) %>%
+        arrange(word)
+        row.names(wordsSW70Df) <- NULL
+        
+# Token words representing 60% of the vocabulary   
+        toksCAllSW60 <- tokens_select(x = toksCAllSW, pattern = featFreq60ToKeepDf$ngrams, selection = "keep", valuetype = "fixed", padding=TRUE ) # fixed for exact matching
+        
+        dfmToks1CAllSW60 <- dfm(toksCAllSW60, remove="")
+        colSumToksCAllSW60 <- colSums(dfmToks1CAllSW60)
+        featNamesToksCAllSW60 <- names(colSumToksCAllSW60)
+        nrWordCAllSW60 <- length(featNamesToksCAllSW60)
+        
+        wordsSW60Df <- data.frame(word = featNamesToksCAllSW60, freq = colSumToksCAllSW60) %>%
+        arrange(word)
+        row.names(wordsSW60Df) <- NULL
+        
+# Token words representing 50% of the vocabulary   
+        toksCAllSW50 <- tokens_select(x = toksCAllSW, pattern = featFreq50ToKeepDf$ngrams, selection = "keep", valuetype = "fixed", padding=TRUE ) # fixed for exact matching
+        
+        dfmToks1CAllSW50 <- dfm(toksCAllSW50, remove="")
+        colSumToksCAllSW50 <- colSums(dfmToks1CAllSW50)
+        featNamesToksCAllSW50 <- names(colSumToksCAllSW50)
+        nrWordCAllSW50 <- length(featNamesToksCAllSW50)
+        
+        wordsSW50Df <- data.frame(word = featNamesToksCAllSW50, freq = colSumToksCAllSW50) %>%
+                arrange(word)
+                row.names(wordsSW50Df) <- NULL
+        
+        
 # Check nr word        
-        nrWordCAllSW95; nrWordCAllSW98; nrWordCAllSW; 
-        # Results: 19949; 60599; 778654
+        nrWordCAllSW; nrWordCAllSW98; nrWordCAllSW95; nrWordCAllSW90; nrWordCAllSW85; nrWordCAllSW80; nrWordCAllSW70; nrWordCAllSW60; nrWordCAllSW50;
+        # [1] 778654
+        # [1] 60599
+        # [1] 19949
+        # [1] 7905
+        # [1] 4184
+        # [1] 2448
+        # [1] 941
+        # [1] 366
+        # [1] 138
+        
 # Save
         saveRDS(toksCAllSW95, "./data/processedData/toksCAllSW95.RDS")
         saveRDS(toksCAllSW98, "./data/processedData/toksCAllSW98.RDS")
+        
+        saveRDS(wordsSW50Df, "./data/processedData/wordsSW50Df.RDS")
+        saveRDS(wordsSW60Df, "./data/processedData/wordsSW60Df.RDS")
+        saveRDS(wordsSW70Df, "./data/processedData/wordsSW70Df.RDS")
+        saveRDS(wordsSW80Df, "./data/processedData/wordsSW80Df.RDS")
+        saveRDS(wordsSW85Df, "./data/processedData/wordsSW85Df.RDS")
+        saveRDS(wordsSW90Df, "./data/processedData/wordsSW90Df.RDS")
         
 #==================================================================================================
 # Test done on the whole corpus with no partition train/test
