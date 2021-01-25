@@ -85,3 +85,21 @@
         
         sumFreqChecksTable <- readRDS("./figures/finalFigures/sumFreqChecksTable.RDS")
 
+        
+# Save df for shiny app and use with SBO KBO fun
+        # Minimal threshold of 21
+        
+        ngram1TrainFreqDfFull <- readRDS("./data/processedData/ngram1TrainFreqDfFull95.RDS")
+        ngram2TrainFreqDfFull <- readRDS("./data/processedData/ngram2TrainFreqDfFull95.RDS")
+        ngram3TrainFreqDfFull <- readRDS("./data/processedData/ngram3TrainFreqDfFull95.RDS")  
+        
+        ngram1Train95Freq21Df <<- ngram1TrainFreqDfFull
+        ngram2Train95Freq21Df <<- ngram2TrainFreqDfFull %>%
+                            filter(freq > 21)
+        ngram3Train95Freq21Df <<- ngram3TrainFreqDfFull%>%
+                            filter(freq > 21)
+        
+        saveRDS(ngram1Train95Freq21Df, "./data/processedData/ngram1Train95Freq21Df.RDS")
+        saveRDS(ngram2Train95Freq21Df, "./data/processedData/ngram2Train95Freq21Df.RDS")
+        saveRDS(ngram3Train95Freq21Df, "./data/processedData/ngram3Train95Freq21Df.RDS")
+        

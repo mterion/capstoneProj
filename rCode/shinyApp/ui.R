@@ -30,10 +30,10 @@ shinyUI(fluidPage(
         mainPanel(
             textInput(inputId = "textInput",
                   label = h3("Text Input"), 
-                  value = inputValue,
+                  value = "",
                   width= "100%"
             ),
-            div(style="display:inline-block;width:50%;text-align: center;",
+            div(style="display:inline-block;width:100%;text-align: center;",
                 actionButton("choice2", textOutput("choice2")),
                 actionButton("choice1", textOutput("choice1")),
                 actionButton("choice3", textOutput("choice3")),
@@ -43,9 +43,9 @@ shinyUI(fluidPage(
            #textOutput("wordSelected")
            #textOutput("textIntegrated")
            #textOutput("fullText")
-           textOutput("stringFull"),
-           textOutput("predict"),
-           textOutput("hit1")
+           #textOutput("stringFull"),
+           #textOutput("predict"),
+           textOutput("actionButtonValue")
            
            
             

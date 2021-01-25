@@ -58,7 +58,10 @@ getBestSBODf <- function(userInput_, backOffFactorAlpha_ = 0.4){
             if(lengthUserInput >= 2){
                     ngram2Prefix <- sprintf("%s%s%s", usInpTokStr[lengthUserInput-1], "_", usInpTokStr[lengthUserInput])
             } else{
-                 return("Minimal word for prediction is 2")
+                  featNames <- c("", "","")
+                  score <- c(0, 0, 0)
+                  nullDf <- data.frame(featNames, score)
+                 return(nullDf)
             }
             
             
@@ -79,7 +82,7 @@ getBestSBODf <- function(userInput_, backOffFactorAlpha_ = 0.4){
                                 
                                 # get df wi and the scores in descending order
                                 wiScoresDfNgram3 <- getWiScoresDfngram3(ngram3FreqScoresDf) %>% 
-                                slice_head(n = 10)
+                                slice_head(n = 3)
                         
                                 cat(green("ngram3 best score df:\n"))
                                 return(wiScoresDfNgram3)
@@ -98,7 +101,7 @@ getBestSBODf <- function(userInput_, backOffFactorAlpha_ = 0.4){
                         
                         # get df wi and the scores in descending order
                         wiScoresDfNgram2 <- getWiScoresDfngram2(ngram2FreqScoresDf)%>% 
-                        slice_head(n = 10)
+                        slice_head(n = 3)
                         wiScoresDfNgram2
                         
                         cat(green("ngram2 best score df:\n"))
@@ -108,7 +111,7 @@ getBestSBODf <- function(userInput_, backOffFactorAlpha_ = 0.4){
                 } else {
                         cat(green("ngram1 best score df:\n"))
                         ngram1HitFreqDf <- getNgram1HitFreqtDf(ngram1FreqDf, backOffFactorAlpha)%>% 
-                                slice_head(n = 10)
+                                slice_head(n = 3)
                         return(ngram1HitFreqDf)
                 }
         }

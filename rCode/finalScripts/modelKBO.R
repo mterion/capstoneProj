@@ -74,7 +74,10 @@ getBestKBODf <- function(userInput_, kValue_ = 5, gamma1Discount_ = 0.5, gamma2D
             if(lengthUserInput >= 2){
                     ngram2Prefix <- sprintf("%s%s%s", usInpTokStr[lengthUserInput-1], "_", usInpTokStr[lengthUserInput])
             } else{
-                 return("Minimal word for prediction is 2")
+                 featNames <- c("", "","")
+                 score <- c(0, 0, 0)
+                 nullDf <- data.frame(featNames, score)
+                 return(nullDf)
             }
             
             
@@ -89,7 +92,8 @@ getBestKBODf <- function(userInput_, kValue_ = 5, gamma1Discount_ = 0.5, gamma2D
                   cat(green("Observed ngram3\n"))
                   # Consider only ML without discounting to gain computing time
                   observedNgram3HitFreqDf <- getObservedNgram3ProbWithoutDisc(ngram3HitFreqDf, ngram2FreqDf, ngram2Prefix, gamma3Disc) %>%
-                        mutate(featNames = str_split_fixed(featNames, "_", 3)[, 3])
+                        mutate(featNames = str_split_fixed(featNames, "_", 3)[, 3]) %>%
+                        top_n(3)
                   return(observedNgram3HitFreqDf)
                   
         } else {
@@ -157,7 +161,7 @@ getBestKBODf <- function(userInput_, kValue_ = 5, gamma1Discount_ = 0.5, gamma2D
                 boNgram3ProbDf <- rbind(unobsBoNgram3ProbDf, ngram3DiscProbaDf) %>%
                         arrange(desc(prob)) %>%
                         mutate(featNames = str_split_fixed(featNames, "_", 3)[, 3])  %>% 
-                        slice_head(n = 10)
+                        slice_head(n = 3)
                 
                         # Check
                         sum(boNgram3ProbDf$prob)
@@ -165,7 +169,7 @@ getBestKBODf <- function(userInput_, kValue_ = 5, gamma1Discount_ = 0.5, gamma2D
                         # If both prefix words unknown in the whole vocabulary
                         if (is.na(sum(boNgram3ProbDf$prob))) { # this means that both words of the ngram2Prefix are unknown in the whole vocabulary, then simply need to take the highest ngram1 proba 
                                 ngram1ProbDf <- getNgram1Prob(ngram1FreqDf)%>% 
-                                slice_head(n = 10)
+                                slice_head(n = 3)
                                 return(ngram1ProbDf)
                         } else {
                                 return(boNgram3ProbDf)  
