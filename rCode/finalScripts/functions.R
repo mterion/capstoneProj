@@ -495,9 +495,15 @@ getTrainTestResults <- function(trainSampleNr_, testSampleNr_, n2FreqMin_, n3Fre
                         df %>%
                                 filter(grepl(paste0("^", letters), word)) %>%
                                 arrange(desc(freq)) %>%
-                                top_n(3) 
+                                top_n(3, word) 
                 }        
                 # nullDf <- getWordOnLetters("Switzer", wordsSW85Df)
                 # 
-                # nrow(nullDf)    
+                # nrow(nullDf)
+        
+#====================================
+# ShinyApp
+#====================================
+        
+        
                 

@@ -44,90 +44,122 @@ wd <- "C:/Users/cliva/OneDrive - Analytic Base/personalFilesManu/data_science/co
 
 
 # Define server logic required to draw a histogram
-shinyServer(function(input, output) {
-    
-# Reactive button values
-    rChoice <- reactiveValues(userChoice = "")
-    
-    output$wordSelected <- renderText({
-        rChoice$userChoice
-    })
-
-    observeEvent(input$choice1, {
-        rChoice$userChoice <- "hit1as"
-    })
-
-    observeEvent(input$choice2, {
-        rChoice$userChoice <- "has"
-    })
-            
-    observeEvent(input$choice3, {
-        rChoice$userChoice <- "asdfasd"
-    })
-
-# Reactive texte value
-
-    inputText <- reactive({
-        input$textInput
-    })
-
-    inputChoice <- reactive({
-        rChoice$userChoice
-    })
-
-    output$stringFull <- renderText({
-        inputText <- inputText()
-        inputChoice <- inputChoice()
-        paste(inputText, inputChoice)
-        })
-    
-
-# Fun to get values in action buttons
-        getActionButtonValues <- function(keyboardInput, hitId){
-                keyboardInput <- tolower(keyboardInput)
-                if(keyboardInput > 0 & (!(grepl("[ \f\t\v]$", keyboardInput)))){
-                    df <- getWordOnLetters(keyboardInput, wordsSW85Df)
-                    hit <- df[hitId,1]
-                        # if NA return from hit
-                        if(is.na(hit)){
-                            # this will be the case after an empty space, need to extract just the last word
-                            lastWord <- stri_extract_last_words(keyboardInput)
-                            df <- getWordOnLetters(lastWord, wordsSW85Df)
+shinyServer(function(input, output, session) {
+  
+#======================================    
+# Function to be used in Shiny
+#====================================== 
+        # Fun to get values in action buttons
+                getActionButtonValues <- function(keyboardInput, hitId){
+                        keyboardInput <- tolower(keyboardInput)
+                        if(keyboardInput > 0 & (!(grepl("[ \f\t\v]$", keyboardInput)))){
+                            df <- getWordOnLetters(keyboardInput, wordsSW85Df)
                             hit <- df[hitId,1]
-                            result <- hit
+                                # if NA return from hit
+                                if(is.na(hit)){
+                                    # this will be the case after an empty space, need to extract just the last word
+                                    lastWord <- stri_extract_last_words(keyboardInput)
+                                    df <- getWordOnLetters(lastWord, wordsSW85Df)
+                                    hit <- df[hitId,1]
+                                    result <- hit
+                                        
+                                } else {
+                                    result <- hit
+                                }
+        
+                        } else if(keyboardInput > 0 & ((grepl("[ \f\t\v]$", keyboardInput)))){
+                                # SBO model
+                                if(model() == 1) {
+                                    SBODf <- getBestSBODf(keyboardInput)
+                                    SBOHit <- SBODf[hitId,1]
+                                    result <- SBOHit
+                                }
                                 
+                                # KBO model
+                                if(model() == 2) {
+                                    KBODf <- getBestKBODf(keyboardInput)
+                                    KBOHit <- KBODf[hitId,1]
+                                    result <- KBOHit
+                                }
+                      
                         } else {
-                            result <- hit
+                            result <- ""
                         }
-
-                } else if(keyboardInput > 0 & ((grepl("[ \f\t\v]$", keyboardInput)))){
-                        SBODf <- getBestSBODf(keyboardInput)
-                        SBOHit <- SBODf[hitId,1]
-                  
-                        result <- SBOHit
-              
-                } else {
-                    result <- "ZeroStart"
+                if(is.na(result)){result <-""} # This ensure that the output is empty and does not show NA
+                return(result)
                 }
-        if(is.na(result)){result <-""} # This ensure that the output is empty and does not show NA
-        return(result)
-        }
-
+                
+        # fun to return input string with user choice
+                getAdjustedString <- function(textString, userChoice){
+                  
+                          # Case of word selected while dialing a word
+                                  # Need to take the last word, remove it and replace it with the selection
+                          if(userChoice !="" & (!(grepl("[ \f\t\v]$", textString)))){
+                                  lastWord <- stri_extract_last_words(textString)
+                                  stringAdjusted <- str_remove(textString, lastWord)
+                                  
+                                  updateTextInput(session, "textInput", value = paste0(stringAdjusted, userChoice, " "))
+                          }
+                          
+                          # Case of word selected after another selection
+                                  # last char is empty space
+                          if(userChoice !="" & ((grepl("[ \f\t\v]$", textString)))){
+                                  updateTextInput(session, "textInput", value = paste0(textString, userChoice, " "))
+                          }
+                }
+                
+#======================================         
+# ReactiveSource / value
+#====================================== 
+                
+        # Object created for storing reactive values
+        rChoice <- reactiveValues(userChoice = "")
+                
+#====================================== 
 # ReactiveExpression / conductor
-        # Values in action buttons        
+#====================================== 
+                
+        # Prediction values in action buttons        
         currentActionButtonValue1 <- reactive({ getActionButtonValues(input$textInput, hitId = 1) })
         currentActionButtonValue2 <- reactive({ getActionButtonValues(input$textInput, hitId = 2) })
         currentActionButtonValue3 <- reactive({ getActionButtonValues(input$textInput, hitId = 3) })
         
-# Button choices input based on algo values
-    output$choice1 <- renderText({ currentActionButtonValue1() })
-    output$choice2 <- renderText({ currentActionButtonValue2() })
-    output$choice3 <- renderText({ currentActionButtonValue3() })
+        # Model choice Values in radio: SBO vs KBO
+        model <- reactive({ input$radioModel })
+        # selectedChoice1 <- reactive({ input$choice1 })
         
-
+        # Ajusted string after action button chosen by the user
+        currentAdjustedString <- reactive({ getAdjustedString(input$textInput, rChoice$userChoice) })
+        
+#======================================         
 # ReactiveEndpoint
-        output$actionButtonValue <- renderText({ currentActionButtonValue1() })
+#====================================== 
+        
+        # Button choices displayed input based on prediction
+        output$predict1 <- renderText({ currentActionButtonValue1() })
+        output$predict2 <- renderText({ currentActionButtonValue2() })
+        output$predict3 <- renderText({ currentActionButtonValue3() })
 
+        #Button action results after user selection
+        output$wordSelected <- renderText({
+            rChoice$userChoice
+        })
+                    # Observer: do not return a value but used for their side effect -> send data to the browser
+                    observeEvent(input$choice1, {
+                        rChoice$userChoice <- currentActionButtonValue1()
+                        
+                        # If observe is positive, then it will run the function that return the adjusted string after the choice selected by the user
+                        currentAdjustedString()
+                    })
 
+                    observeEvent(input$choice2, {
+                        rChoice$userChoice <- currentActionButtonValue2()
+                        currentAdjustedString()
+                    })
+
+                    observeEvent(input$choice3, {
+                        rChoice$userChoice <- currentActionButtonValue3()
+                        currentAdjustedString()
+                    })
 
 })

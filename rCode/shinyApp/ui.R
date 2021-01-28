@@ -11,14 +11,14 @@ library(shiny)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
-
+    
     # Application title
     titlePanel("Natural Language Processing Application"),
 
     # Sidebar with a slider input for number of bins
     sidebarLayout(
         sidebarPanel(
-            radioButtons("radio", 
+            radioButtons("radioModel", 
                          h3("Type of NLP Model"),
                          choices = list(
                              "SBO" = 1,
@@ -30,24 +30,14 @@ shinyUI(fluidPage(
         mainPanel(
             textInput(inputId = "textInput",
                   label = h3("Text Input"), 
-                  value = "",
+                  value = "" ,
                   width= "100%"
             ),
             div(style="display:inline-block;width:100%;text-align: center;",
-                actionButton("choice2", textOutput("choice2")),
-                actionButton("choice1", textOutput("choice1")),
-                actionButton("choice3", textOutput("choice3")),
+                actionButton("choice2", textOutput("predict2")),
+                actionButton("choice1", textOutput("predict1")),
+                actionButton("choice3", textOutput("predict3")),
             ),
-            
-           h3("Returned Value:"),
-           #textOutput("wordSelected")
-           #textOutput("textIntegrated")
-           #textOutput("fullText")
-           #textOutput("stringFull"),
-           #textOutput("predict"),
-           textOutput("actionButtonValue")
-           
-           
             
         ) # End of mainPanel
     ) # End of sidebarLayout

@@ -68,8 +68,8 @@
         ### Trials
 #=============================================================         
 # Coursera test
-        getBestSBOVal("I want")
-        getBestKBOVal("I want")        
+        #getBestSBOVal("I want")
+        #getBestKBOVal("I want")        
                 
 
         # with freq: 15 = 13%, 10 = 16%, 5  = 16% -> 10 seems to be the best ratio betwee computing time and accuracy -> need to confirm this on 1 mio

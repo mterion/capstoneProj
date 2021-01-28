@@ -354,6 +354,10 @@ Nevertheless, the trend in accuracy reveals a very interesting point: despite th
 
 This point emphasizes the weakness of an approach based on n-grams model. The limitation is set to a sequence of maximum three words due to processing time constraints. Those probabilistic models do not take into consideration the context of whole sentences or longer sequences. A deep learning model approach will later be developed to address those issues.
 
+### 4.3 Word suggestion based on letter entry
+To be useful for the user of a mobile device, the App should not be limited to predicting the next word, but also provide a suggestion for the word being currently dialed. Therefore, after each entry of a letter by the user, constant word suggestions are made.
+
+Processing speed was paramount and therefore, a threshold needed to be set to limiting the number of words in the vocabulary to be processed. It was found that with a vocabulary covering 85% of the words used in the training set corpus, the amount of word could be brought down to only 4184, which produced the satisfactory processing speed of 0.01 sec for suggesting the three highest frequency words based on the letters being currently entered by the user. This reactivity allow the best user experience. 
 
 ## 5. Results
 The testing as indicated in the table underneath, was conducted on a random selection of 20'000 samples in the test set. It shows an accuracy of 28% for the KBO and 29% for the SBO algorithms. 
@@ -366,7 +370,7 @@ Those are very good results, especially considering that:
     + This is explained by the great size of the training set which negates the advantage that KBO could have add on smaller data sets.
 * An average processing time of 0.59 seconds for SBO and 0.66 seconds for KBO, at a ngram2/ngram3 minimal frequency threshold of 21.
 
-To conclude, given the efficiency demonstrated by the SBO algorithm, the latter will be used for the development of the application. 
+To conclude, given the efficiency demonstrated by the SBO algorithm, the latter has been implemented in the development of the application. 
 
 
 ```{r testTable, fig.height= 2.05 }
